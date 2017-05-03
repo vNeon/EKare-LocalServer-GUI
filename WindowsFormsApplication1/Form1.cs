@@ -12,15 +12,18 @@ using System.Web.Script.Serialization;
 using System.Windows.Forms;
 using Microsoft.Kinect;
 using Coding4Fun.Kinect.WinForm;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+
 namespace WindowsFormsApplication1
 {
     public partial class Form1 : Form
     {
 
         private KinectSensor kinect;
-
-        private DepthImagePixel[] depthPixels;
-        private byte[] colorPixels;
+        private const float MaxDepthDistance = 4000;
+        private const float MinDepthDistance = 850;
+        private const float MaxDepthDistanceOffset = MaxDepthDistance - MinDepthDistance;
 
         public Form1()
         {
@@ -121,7 +124,7 @@ namespace WindowsFormsApplication1
                 kinect.ColorStream.Disable();
                 kinect.SkeletonStream.Disable();
                 kinect.DepthStream.Enable();
-                kinect.DepthStream.Range = DepthRange.Near;
+                //kinect.DepthStream.Range = DepthRange.Near;
                 kinect.DepthFrameReady += Kinect_DepthFrameReady;
                 
             }
@@ -146,6 +149,7 @@ namespace WindowsFormsApplication1
                 videoBox.Image = null;
             }
         }
+
 
         private void Kinect_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
@@ -191,7 +195,7 @@ namespace WindowsFormsApplication1
         //    //Find the first person to track
         //    var trackedPerson = skeletons.FirstOrDefault(s => s.TrackingState == SkeletonTrackingState.Tracked);
 
-        //    if(trackedPerson !=null)
+        //    if (trackedPerson != null)
         //    {
         //        SkeletonPoint position = trackedPerson.Joints[JointType.Head].Position;
         //        CoordinateMapper mapper = new CoordinateMapper(kinect);
@@ -217,22 +221,68 @@ namespace WindowsFormsApplication1
             return bmpFrame;
         }
 
-        //private Bitmap CreateDepthBitMap(DepthImageFrame f)
-        //{
+        private Bitmap CreateDepthBitMap(DepthImageFrame f)
+        {
+            // raw data from kinect with the depth for every pixel
+            short[] depthData = new short[f.PixelDataLength];
+            f.CopyPixelDataTo(depthData);
 
-        //    depthPixels = new DepthImagePixel[kinect.DepthStream.FramePixelDataLength];
-        //    colorPixels = new byte[kinect.DepthStream.FramePixelDataLength * sizeof(int)];
-        //    f.CopyDepthImagePixelDataTo(this.depthPixels);
+            //We want to build a bitmap, hence need an array of bytes
+            // The size of the byte array is the width * height *4, 4 since we are doing rgba
+            Byte[] colorPixels = new byte[f.Height * f.Width * 4];
+            int stride = f.Width * 4;
 
-        //    return depthPixels.TOBitMap
+            const int blueIndex= 0;
+            const int greenIndex = 1;
+            const int redIndex = 2;
 
-        //    WriteableBitmap colorBitmap;
+            for(int depthIndex =0, colorIndex =0; depthIndex < depthData.Length && colorIndex < colorPixels.Length; depthIndex ++, colorIndex += 4)
+            {
+                int player = colorPixels[depthIndex] & DepthImageFrame.PlayerIndexBitmask;
 
-        //    this.colorBitmap = new WriteableBitmap(this.sensor.DepthStream.FrameWidth, this.sensor.DepthStream.FrameHeight,
-        //     96.0, 96.0, PixelFormats.Bgr32, null);
+                int depth = depthData[depthIndex] >> DepthImageFrame.PlayerIndexBitmaskWidth;
 
+                if (depth <= 900)
+                {
+                    colorPixels[colorIndex + blueIndex] = 255;
+                    colorPixels[colorIndex + greenIndex] = 0;
+                    colorPixels[colorIndex + redIndex] = 0;
+                }
+                else if (depth > 900 & depth < 2000)
+                {
+                    colorPixels[colorIndex + blueIndex] = 0;
+                    colorPixels[colorIndex + greenIndex] = 255;
+                    colorPixels[colorIndex + redIndex] = 0;
+                }
+                else if (depth >= 2000)
+                {
+                    colorPixels[colorIndex + blueIndex] = 0;
+                    colorPixels[colorIndex + greenIndex] = 0;
+                    colorPixels[colorIndex + redIndex] = 255;
+                }
 
-        //}
+                ////Monocrhomatic greyscale
+                //byte intensity = CalculateIntensityFromDepth(depth);
+
+                //colorPixels[colorIndex + blueIndex] = intensity;
+                //colorPixels[colorIndex + greenIndex] = intensity;
+                //colorPixels[colorIndex + redIndex] = intensity;
+
+            }
+
+            BitmapSource btSource = BitmapSource.Create(f.Width, f.Height, 96, 96, PixelFormats.Bgr32, null, colorPixels, stride);
+            Bitmap bitmap;
+            using (MemoryStream outStream = new MemoryStream())
+            {
+                BitmapEncoder enc = new BmpBitmapEncoder();
+                enc.Frames.Add(BitmapFrame.Create(btSource));
+                enc.Save(outStream);
+                bitmap = new System.Drawing.Bitmap(outStream);
+            }
+            return bitmap;
+ 
+
+        }
 
 
         private void KinectSensors_StatusChanged(object sender, StatusChangedEventArgs e)
@@ -247,6 +297,12 @@ namespace WindowsFormsApplication1
             kinect.ColorFrameReady += Kinect_ColorFrameReady;
         }
 
+        public static byte CalculateIntensityFromDepth(int distance )
+        {
+
+            return (byte)(255 - (255 * Math.Max(distance - MinDepthDistance, 0) / (MaxDepthDistanceOffset)));
+
+        }
         private void DisplayDepth()
         {
 
