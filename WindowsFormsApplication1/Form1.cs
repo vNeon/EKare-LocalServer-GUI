@@ -25,6 +25,13 @@ namespace WindowsFormsApplication1
         private const float MinDepthDistance = 850;
         private const float MaxDepthDistanceOffset = MaxDepthDistance - MinDepthDistance;
 
+        //HEAD postions:
+        private float preHX = -1;
+        private float preHY = -1;
+        private float preHZ = -1;
+
+
+
         public Form1()
         {
             InitializeComponent();
@@ -32,7 +39,14 @@ namespace WindowsFormsApplication1
 
         private void button1_Click(object sender, EventArgs e)
         {
-            String message = textBox1.Text;
+            SendNotification("");
+        }
+
+
+        private void SendNotification(string v)
+        {
+            //String message = textBox1.Text;
+            String message = "Falled detected on Monday, May 15, 2017 1:45 PM";//+ DateTime.Now;
             String str;
             try
             {
@@ -50,7 +64,7 @@ namespace WindowsFormsApplication1
                     to = "/topics/all",
                     notification = new
                     {
-                        body = message,
+                        body = message, 
                         title = "Message:",
                         sound = "Enabled"
                     }
@@ -84,6 +98,7 @@ namespace WindowsFormsApplication1
 
             tbOutput.Text = str;
         }
+    
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -96,8 +111,14 @@ namespace WindowsFormsApplication1
                 kinect = KinectSensor.KinectSensors[0];
                 lblConnectionID.Text = kinect.DeviceConnectionId;
                 tbOutput.AppendText("Found kinectID: " + kinect.DeviceConnectionId + "\n");
+                //kinect.DepthStream.Enable();
+                kinect.SkeletonStream.Enable();
+                //kinect.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+
+
             }
         }
+
 
         private void radioButton_CheckedChanged(object sender, EventArgs e)
         {
@@ -124,22 +145,9 @@ namespace WindowsFormsApplication1
                 kinect.ColorStream.Disable();
                 kinect.SkeletonStream.Disable();
                 kinect.DepthStream.Enable();
-                //kinect.DepthStream.Range = DepthRange.Near;
+                kinect.DepthStream.Range = DepthRange.Default;
                 kinect.DepthFrameReady += Kinect_DepthFrameReady;
                 
-            }
-            else if (radioButton3.Checked)
-            {
-                if (!kinect.IsRunning)
-                {
-                    kinect.Start();
-                    tbOutput.AppendText("Started Kinect!\n");
-                }
-                kinect.ColorStream.Disable();
-                kinect.DepthStream.Disable();
-                kinect.SkeletonStream.Enable();
-                kinect.SkeletonStream.TrackingMode = SkeletonTrackingMode.Seated;
-                kinect.SkeletonFrameReady += Kinect_SkeletonFrameReady;
             }
             else
             {
@@ -150,14 +158,48 @@ namespace WindowsFormsApplication1
             }
         }
 
+        //Turn on the skeleton tracking 
+        private void skeletonCB_CheckedChanged(object sender, EventArgs e)
+        {
+            if (kinect.IsRunning)
+            {
+                kinect.SkeletonStream.Enable();
+                //kinect.SkeletonStream.TrackingMode = SkeletonTrackingMode.Seated;
+                kinect.SkeletonFrameReady += Kinect_SkeletonFrameReady;
+            }
+        }   
 
         private void Kinect_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
             using (SkeletonFrame f = e.OpenSkeletonFrame())
             {
-                if (f != null)
+                if (f == null)
                 {
-                    //videoBox.Image = CreateSkeletonTrackingMap(f);
+                    return;
+                }
+                var skeletons = new Skeleton[f.SkeletonArrayLength];
+                f.CopySkeletonDataTo(skeletons);
+
+                //Find the first person to track
+                var trackedPerson = skeletons.FirstOrDefault(s => s.TrackingState == SkeletonTrackingState.Tracked);
+
+                if (trackedPerson != null)
+                {
+                    SkeletonPoint positionHead = trackedPerson.Joints[JointType.Head].Position;
+                    SkeletonPoint positionHip = trackedPerson.Joints[JointType.HipCenter].Position;
+                    headXlbl.Text = positionHead.X.ToString();
+                    headYlbl.Text = positionHead.Y.ToString();
+                    headZlbl.Text = positionHead.Z.ToString();
+                    // Check the HEAD X position
+
+                    if (preHX ==-1)
+                    {
+                        DetectFall(positionHead, positionHip);
+                    }
+                    CoordinateMapper mapper = new CoordinateMapper(kinect);
+                    var colorPoint = mapper.MapSkeletonPointToColorPoint(positionHead, ColorImageFormat.InfraredResolution640x480Fps30);
+
+
                 }
             }
         }
@@ -200,7 +242,6 @@ namespace WindowsFormsApplication1
         //        SkeletonPoint position = trackedPerson.Joints[JointType.Head].Position;
         //        CoordinateMapper mapper = new CoordinateMapper(kinect);
         //        var colorPoint = mapper.MapSkeletonPointToColorPoint(position, ColorImageFormat.InfraredResolution640x480Fps30);
-
 
         //    }
 
@@ -310,6 +351,20 @@ namespace WindowsFormsApplication1
         
         private void DisplaySkeletal()
         {
+
+        }
+
+        private void DetectFall(SkeletonPoint head, SkeletonPoint hip)
+        {
+            if(Math.Abs(head.Y - hip.Y) <= 0.1 || (preHY -head.Y) >= 0.5  )
+            {
+                SendNotification("Fall detected");
+                tbOutput.AppendText("Fall detected");
+            }else
+            {
+                tbOutput.AppendText(Math.Abs(head.Y - hip.Y).ToString() + " ---- " + Math.Abs(preHY - head.Y).ToString());
+            }
+
 
         }
     }

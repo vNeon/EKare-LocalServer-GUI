@@ -40,8 +40,11 @@
             this.videoBox = new System.Windows.Forms.PictureBox();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.radioButton2 = new System.Windows.Forms.RadioButton();
-            this.radioButton3 = new System.Windows.Forms.RadioButton();
             this.radioButton4 = new System.Windows.Forms.RadioButton();
+            this.skeletonCB = new System.Windows.Forms.CheckBox();
+            this.headXlbl = new System.Windows.Forms.Label();
+            this.headYlbl = new System.Windows.Forms.Label();
+            this.headZlbl = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.videoBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -186,22 +189,10 @@
             this.radioButton2.UseVisualStyleBackColor = true;
             this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButton_CheckedChanged);
             // 
-            // radioButton3
-            // 
-            this.radioButton3.AutoSize = true;
-            this.radioButton3.Location = new System.Drawing.Point(485, 592);
-            this.radioButton3.Name = "radioButton3";
-            this.radioButton3.Size = new System.Drawing.Size(134, 21);
-            this.radioButton3.TabIndex = 13;
-            this.radioButton3.TabStop = true;
-            this.radioButton3.Text = "SkeletalTracking";
-            this.radioButton3.UseVisualStyleBackColor = true;
-            this.radioButton3.CheckedChanged += new System.EventHandler(this.radioButton_CheckedChanged);
-            // 
             // radioButton4
             // 
             this.radioButton4.AutoSize = true;
-            this.radioButton4.Location = new System.Drawing.Point(665, 592);
+            this.radioButton4.Location = new System.Drawing.Point(518, 592);
             this.radioButton4.Name = "radioButton4";
             this.radioButton4.Size = new System.Drawing.Size(58, 21);
             this.radioButton4.TabIndex = 14;
@@ -210,13 +201,54 @@
             this.radioButton4.UseVisualStyleBackColor = true;
             this.radioButton4.CheckedChanged += new System.EventHandler(this.radioButton_CheckedChanged);
             // 
+            // skeletonCB
+            // 
+            this.skeletonCB.AutoSize = true;
+            this.skeletonCB.Location = new System.Drawing.Point(731, 592);
+            this.skeletonCB.Name = "skeletonCB";
+            this.skeletonCB.Size = new System.Drawing.Size(101, 21);
+            this.skeletonCB.TabIndex = 15;
+            this.skeletonCB.Text = "skeletonCB";
+            this.skeletonCB.UseVisualStyleBackColor = true;
+            this.skeletonCB.CheckedChanged += new System.EventHandler(this.skeletonCB_CheckedChanged);
+            // 
+            // headXlbl
+            // 
+            this.headXlbl.AutoSize = true;
+            this.headXlbl.Location = new System.Drawing.Point(617, 61);
+            this.headXlbl.Name = "headXlbl";
+            this.headXlbl.Size = new System.Drawing.Size(14, 17);
+            this.headXlbl.TabIndex = 16;
+            this.headXlbl.Text = "x";
+            // 
+            // headYlbl
+            // 
+            this.headYlbl.AutoSize = true;
+            this.headYlbl.Location = new System.Drawing.Point(743, 61);
+            this.headYlbl.Name = "headYlbl";
+            this.headYlbl.Size = new System.Drawing.Size(15, 17);
+            this.headYlbl.TabIndex = 17;
+            this.headYlbl.Text = "y";
+            // 
+            // headZlbl
+            // 
+            this.headZlbl.AutoSize = true;
+            this.headZlbl.Location = new System.Drawing.Point(853, 61);
+            this.headZlbl.Name = "headZlbl";
+            this.headZlbl.Size = new System.Drawing.Size(15, 17);
+            this.headZlbl.TabIndex = 18;
+            this.headZlbl.Text = "z";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1311, 641);
+            this.Controls.Add(this.headZlbl);
+            this.Controls.Add(this.headYlbl);
+            this.Controls.Add(this.headXlbl);
+            this.Controls.Add(this.skeletonCB);
             this.Controls.Add(this.radioButton4);
-            this.Controls.Add(this.radioButton3);
             this.Controls.Add(this.radioButton2);
             this.Controls.Add(this.radioButton1);
             this.Controls.Add(this.videoBox);
@@ -252,8 +284,11 @@
         private System.Windows.Forms.PictureBox videoBox;
         private System.Windows.Forms.RadioButton radioButton1;
         private System.Windows.Forms.RadioButton radioButton2;
-        private System.Windows.Forms.RadioButton radioButton3;
         private System.Windows.Forms.RadioButton radioButton4;
+        private System.Windows.Forms.CheckBox skeletonCB;
+        private System.Windows.Forms.Label headXlbl;
+        private System.Windows.Forms.Label headYlbl;
+        private System.Windows.Forms.Label headZlbl;
     }
 }
 
