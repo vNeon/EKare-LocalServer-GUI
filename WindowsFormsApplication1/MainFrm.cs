@@ -17,9 +17,9 @@ using System.Windows.Media.Imaging;
 
 namespace WindowsFormsApplication1
 {
-    public partial class Form1 : Form
+    public partial class MainFrm : Form
     {
-
+        private String username = String.Empty;
         private KinectSensor kinect;
         private const float MaxDepthDistance = 4000;
         private const float MinDepthDistance = 850;
@@ -28,25 +28,39 @@ namespace WindowsFormsApplication1
         //HEAD postions:
         private float preHX = -1;
         private float preHY = -1;
-        private float preHZ = -1;
+        //private float preHZ = -1;
 
 
 
-        public Form1()
+        public MainFrm(String user)
         {
+            username = user;
             InitializeComponent();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            SendNotification("");
+            //SendNotification("");
+            GetDataFromFirebase();
+        }
+
+
+        private void GetDataFromFirebase()
+
+        {
+
+            string uri = "https://myfirstapplication-5ad99.firebaseio.com/users/6b4rvGyIgMgQMo1XQBVKglI5k7l1.json/?auth=rngcgjOb25J68o1JW5XUEFigUbO86kNQmKxN4IB5";
+            FirebaseRequest fq = new FirebaseRequest( uri, httpMethod.GET);
+            fq.makeRequest();
+            String res = fq.executeGetRequest();
+            tbOutput.AppendText(res);
         }
 
 
         private void SendNotification(string v)
         {
             //String message = textBox1.Text;
-            String message = "Falled detected on Monday, May 15, 2017 1:45 PM";//+ DateTime.Now;
+            String message = "Fall detected on Monday, May 15, 2017 1:45 PM";//+ DateTime.Now;
             String str;
             try
             {
@@ -75,6 +89,8 @@ namespace WindowsFormsApplication1
                 tRequest.Headers.Add(string.Format("Authorization: key={0}", applicationID));
                 tRequest.Headers.Add(string.Format("Sender: id={0}", senderId));
                 tRequest.ContentLength = byteArray.Length;
+
+                //
                 using (Stream dataStream = tRequest.GetRequestStream())
                 {
                     dataStream.Write(byteArray, 0, byteArray.Length);
@@ -90,6 +106,7 @@ namespace WindowsFormsApplication1
                         }
                     }
                 }
+
             }
             catch (Exception ex)
             {
@@ -366,6 +383,13 @@ namespace WindowsFormsApplication1
             }
 
 
+        }
+        
+
+        private void storeDataTest()
+        {
+            String m = "Hello";
+            
         }
     }
 }
