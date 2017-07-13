@@ -19,14 +19,7 @@ namespace WindowsFormsApplication1
         public string phone { get; set; }
 
         //[JsonProperty("contacts")]
-        //private Dictionary<string,Email> contacts { get; set; }
+        //private List<KeyValuePair<string,string>> contacts { get; set; }
     }
 
-
-    class Contact
-    {
-        private string id { get; set; }
-        
-        private string email { get; set; }
-    }
 }

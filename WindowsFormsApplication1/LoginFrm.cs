@@ -14,7 +14,7 @@ namespace WindowsFormsApplication1
 {
     public partial class LoginFrm : Form
     {
-        String user = String.Empty;
+        String userName = String.Empty;
         public LoginFrm()
         {
             InitializeComponent();
@@ -34,12 +34,14 @@ namespace WindowsFormsApplication1
             else
             {
                 this.Hide();
-                MainFrm mainForm = new MainFrm(user);
+                MainFrm mainForm = new MainFrm(userName);
                 mainForm.Show();
             }
         }
 
-
+        /**
+         * Check if there is any user with the same email. 
+         */ 
         private bool verfifyAccount(String email, String password)
         {
             Dictionary<string, User> users = getUserList();
@@ -50,21 +52,38 @@ namespace WindowsFormsApplication1
                 if (user.email.Equals(email))
                 {
                     GlobalValues.userID = s;
+                    userName = user.name;
+                    getUserContacts();
                     return true;
                 }
             }
-
             return false    ;
         }
 
+        /**
+         * Getting all users from the database, might be inefficient but works for now
+         */ 
         private Dictionary<string,User> getUserList()
         {
             FirebaseRequest emailRequest = new FirebaseRequest(GlobalValues.FBRTDBURI + "/" + Table.users.ToString() + ".json" + "?auth=" + GlobalValues.dbSecret, httpMethod.GET);
             emailRequest.makeRequest();
             String res = emailRequest.executeGetRequest();
-            Console.WriteLine(res);
             Dictionary<string, User> jsonTemp = JsonConvert.DeserializeObject<Dictionary<string, User>>(res);
             return jsonTemp;
+        }
+
+
+        private void getUserContacts()
+        {
+            FirebaseRequest contactsRequest = new FirebaseRequest(GlobalValues.FBRTDBURI + "/" + Table.users.ToString() + "/"+GlobalValues.userID+"/contacts.json" + "?auth=" + GlobalValues.dbSecret, httpMethod.GET);
+            contactsRequest.makeRequest();
+            String res = contactsRequest.executeGetRequest();
+            Console.WriteLine(res);
+            if (res != null && res != "")
+            {
+                Dictionary<String, String> jsonTemp = JsonConvert.DeserializeObject<Dictionary<String, String>>(res);
+                GlobalValues.contacts = jsonTemp;
+            }
         }
         private void LoginFrm_Load(object sender, EventArgs e)
         {
