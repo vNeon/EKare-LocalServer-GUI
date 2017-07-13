@@ -53,6 +53,7 @@ namespace WindowsFormsApplication1
                 {
                     GlobalValues.userID = s;
                     userName = user.name;
+                    GlobalValues.user = user;
                     getUserContacts();
                     return true;
                 }

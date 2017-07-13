@@ -49,7 +49,8 @@ namespace WindowsFormsApplication1
 
         private void sendMessageBtn_Click(object sender, EventArgs e)
         {
-              
+            String message = messageTb.Text;
+            messageSender.sendMessageToAllContact(message);
         }
 
         private void GetDataFromFirebase()

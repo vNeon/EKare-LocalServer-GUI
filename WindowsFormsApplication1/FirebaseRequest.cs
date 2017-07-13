@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net.Http;
 using System.Net;
 using System.IO;
+using System.Web.Script.Serialization;
+
+
 namespace WindowsFormsApplication1
 {
     /*
@@ -29,6 +33,7 @@ namespace WindowsFormsApplication1
         private String endPoint { get; set; }
         private httpMethod httpMethod { get; set; }
         private HttpWebRequest request = null;
+        private static readonly HttpClient client = new HttpClient();
 
         public FirebaseRequest(String URI , httpMethod method)
         {
@@ -76,5 +81,16 @@ namespace WindowsFormsApplication1
 
             return responseString;
         }
+
+
+        public async void executePostRequest(Message message)
+        {
+            var serializer = new JavaScriptSerializer();
+            var json = serializer.Serialize(message);
+            var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
+            var response = await client.PostAsync(endPoint, content);
+            var responseString = await response.Content.ReadAsStringAsync();
+        }
+
     }
 }
