@@ -14,13 +14,15 @@ namespace WindowsFormsApplication1
         public string message { get; set; }
         [JsonProperty("timeDate")]
         public string timeDate { get; set; }
+        [JsonProperty("imageURL")]
+        public string imageURL { get; set; }
 
-
-        public Message(string message, string sender)
+        public Message(string message, string sender, string imageURL)
         {
             this.message = message;
             this.timeDate = DateTime.Now.ToString();
             this.sender = sender;
+            this.imageURL = imageURL;
         }
 
     }
