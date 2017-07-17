@@ -37,8 +37,13 @@ namespace WindowsFormsApplication1
         //private float preHZ = -1;
         private long prevTs = -1;
 
+<<<<<<< HEAD
         private int counter=150;
         private int counterInputCount = 0;
+=======
+        //SVM Model Object
+        public SVMTest svm;
+>>>>>>> c79ee0066c4a0400dfacc9b026200eed6a49a365
 
         private double[][] trainingDataset = new double[10][];
        
@@ -396,6 +401,19 @@ namespace WindowsFormsApplication1
             
         }
 
+        private void SVMBtn_Click(object sender, EventArgs e)
+        {
+            svm = new SVMTest(@"C:\Users\n\Desktop\examples.xls");
+            svm.buildModel();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (svm != null)
+            {
+                svm.classify();
+            }
+        }
     }
 }
 
