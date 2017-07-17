@@ -34,6 +34,8 @@ namespace WindowsFormsApplication1
         private float preHY = -1;
         //private float preHZ = -1;
 
+        //SVM Model Object
+        public SVMTest svm;
 
 
         public MainFrm(String user)
@@ -343,6 +345,19 @@ namespace WindowsFormsApplication1
             
         }
 
+        private void SVMBtn_Click(object sender, EventArgs e)
+        {
+            svm = new SVMTest(@"C:\Users\n\Desktop\examples.xls");
+            svm.buildModel();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (svm != null)
+            {
+                svm.classify();
+            }
+        }
     }
 }
 

@@ -45,6 +45,8 @@
             this.headZlbl = new System.Windows.Forms.Label();
             this.messageTb = new System.Windows.Forms.TextBox();
             this.sendMessageBtn = new System.Windows.Forms.Button();
+            this.SVMBtn = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.videoBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -66,9 +68,9 @@
             this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbOutput.Location = new System.Drawing.Point(967, 139);
+            this.tbOutput.Location = new System.Drawing.Point(967, 194);
             this.tbOutput.Name = "tbOutput";
-            this.tbOutput.Size = new System.Drawing.Size(328, 432);
+            this.tbOutput.Size = new System.Drawing.Size(328, 377);
             this.tbOutput.TabIndex = 2;
             this.tbOutput.Text = "";
             // 
@@ -78,7 +80,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(964, 109);
+            this.label2.Location = new System.Drawing.Point(964, 153);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(55, 17);
             this.label2.TabIndex = 4;
@@ -240,11 +242,33 @@
             this.sendMessageBtn.UseVisualStyleBackColor = true;
             this.sendMessageBtn.Click += new System.EventHandler(this.sendMessageBtn_Click);
             // 
+            // SVMBtn
+            // 
+            this.SVMBtn.Location = new System.Drawing.Point(1003, 91);
+            this.SVMBtn.Name = "SVMBtn";
+            this.SVMBtn.Size = new System.Drawing.Size(133, 35);
+            this.SVMBtn.TabIndex = 20;
+            this.SVMBtn.Text = "SVM Build Model";
+            this.SVMBtn.UseVisualStyleBackColor = true;
+            this.SVMBtn.Click += new System.EventHandler(this.SVMBtn_Click);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(1143, 91);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(132, 35);
+            this.button2.TabIndex = 21;
+            this.button2.Text = "Classify Input";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // MainFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1311, 641);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.SVMBtn);
             this.Controls.Add(this.sendMessageBtn);
             this.Controls.Add(this.headZlbl);
             this.Controls.Add(this.headYlbl);
@@ -290,6 +314,8 @@
         private System.Windows.Forms.Label headZlbl;
         private System.Windows.Forms.TextBox messageTb;
         private System.Windows.Forms.Button sendMessageBtn;
+        private System.Windows.Forms.Button SVMBtn;
+        private System.Windows.Forms.Button button2;
     }
 }
 
