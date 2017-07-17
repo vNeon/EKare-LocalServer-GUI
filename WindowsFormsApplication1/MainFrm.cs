@@ -14,6 +14,7 @@ using Microsoft.Kinect;
 using Coding4Fun.Kinect.WinForm;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Runtime.InteropServices;
 
 namespace WindowsFormsApplication1
 {
@@ -30,12 +31,17 @@ namespace WindowsFormsApplication1
         private const float MaxDepthDistanceOffset = MaxDepthDistance - MinDepthDistance;
 
         //HEAD postions:
+        private SkeletonPoint prevH;
         private float preHX = -1;
         private float preHY = -1;
         //private float preHZ = -1;
+        private long prevTs = -1;
 
+        private int counter=150;
+        private int counterInputCount = 0;
 
-
+        private double[][] trainingDataset = new double[10][];
+       
         public MainFrm(String user)
         {
             username = user;
@@ -53,10 +59,12 @@ namespace WindowsFormsApplication1
             messageSender.sendMessageToAllContact(message);
         }
 
+        /// <summary>
+        ///  Get user data from the firebase database
+        /// </summary>
         private void GetDataFromFirebase()
 
         {
-
             string uri = "https://myfirstapplication-5ad99.firebaseio.com/users/6b4rvGyIgMgQMo1XQBVKglI5k7l1.json/?auth=rngcgjOb25J68o1JW5XUEFigUbO86kNQmKxN4IB5";
             FirebaseRequest fq = new FirebaseRequest( uri, httpMethod.GET);
             fq.makeRequest();
@@ -96,10 +104,11 @@ namespace WindowsFormsApplication1
                 if (!kinect.IsRunning)
                 {
                     kinect.Start();
+                    
                     tbOutput.AppendText("Started Kinect!\n");
                 }
                 kinect.DepthStream.Disable();
-                kinect.SkeletonStream.Disable();
+              //  kinect.SkeletonStream.Disable();
                 kinect.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
                 kinect.ColorFrameReady += Kinect_ColorFrameReady;
             }
@@ -111,7 +120,7 @@ namespace WindowsFormsApplication1
                     tbOutput.AppendText("Started Kinect!\n");
                 }
                 kinect.ColorStream.Disable();
-                kinect.SkeletonStream.Disable();
+               // kinect.SkeletonStream.Disable();
                 kinect.DepthStream.Enable();
                 kinect.DepthStream.Range = DepthRange.Default;
                 kinect.DepthFrameReady += Kinect_DepthFrameReady;
@@ -137,10 +146,12 @@ namespace WindowsFormsApplication1
             }
         }   
 
+        // Get the skeletal coordinates
         private void Kinect_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
             using (SkeletonFrame f = e.OpenSkeletonFrame())
             {
+                counter++;
                 if (f == null)
                 {
                     return;
@@ -151,6 +162,8 @@ namespace WindowsFormsApplication1
                 //Find the first person to track
                 var trackedPerson = skeletons.FirstOrDefault(s => s.TrackingState == SkeletonTrackingState.Tracked);
 
+                long timeNow = Convert.ToInt64( f.Timestamp.ToString());
+
                 if (trackedPerson != null)
                 {
                     SkeletonPoint positionHead = trackedPerson.Joints[JointType.Head].Position;
@@ -158,12 +171,42 @@ namespace WindowsFormsApplication1
                     headXlbl.Text = positionHead.X.ToString();
                     headYlbl.Text = positionHead.Y.ToString();
                     headZlbl.Text = positionHead.Z.ToString();
-                    // Check the HEAD X position
-
+                    SkeletonPoint shoulderLeft = trackedPerson.Joints[JointType.ShoulderLeft].Position;
+                    SkeletonPoint shoulderRight = trackedPerson.Joints[JointType.ShoulderRight].Position;
+                    SkeletonPoint hipCenter = trackedPerson.Joints[JointType.HipCenter].Position;
                     if (preHX ==-1)
                     {
-                        DetectFall(positionHead, positionHip);
                     }
+                    else
+                    {
+                        Console.WriteLine(counter);
+                        if (counter >= 150) {
+                            
+                            double headHipDiff = Math.Sqrt(Math.Pow(positionHead.X - positionHip.X, 2) + Math.Pow(positionHead.Y - positionHip.Y, 2)
+                                                    + Math.Pow(positionHead.Y - positionHip.Y, 2));
+                            double headDiff = Math.Sqrt(Math.Pow(positionHead.X - prevH.X, 2) + Math.Pow(positionHead.Y - prevH.Y, 2)
+                                                    + Math.Pow(positionHead.Y - prevH.Y, 2));
+
+                            long timeDiff = timeNow - prevTs;
+
+                            double boundingBoxWidth = Math.Abs(shoulderLeft.X - shoulderRight.X) + 0.6;
+                            double boundindBoxHeight = Math.Abs(positionHead.Y - hipCenter.Y) + 1.2;
+                            double[] inputArray = { headHipDiff, headDiff, timeDiff, boundindBoxHeight, boundingBoxWidth };
+                            Console.WriteLine("INPUT: " +counterInputCount);
+                            for (int i =0; i<5; i++)
+                            {
+                                Console.Write(inputArray[i] + " -- ");
+                            }
+                            Console.WriteLine();
+                            counterInputCount++;
+                            counter = 0;
+                         }
+                    }
+
+                    // update previous values
+                    prevTs = timeNow;
+                    prevH = positionHead;
+                    preHX = positionHead.X;
                     CoordinateMapper mapper = new CoordinateMapper(kinect);
                     var colorPoint = mapper.MapSkeletonPointToColorPoint(positionHead, ColorImageFormat.InfraredResolution640x480Fps30);
 
@@ -235,6 +278,17 @@ namespace WindowsFormsApplication1
             // raw data from kinect with the depth for every pixel
             short[] depthData = new short[f.PixelDataLength];
             f.CopyPixelDataTo(depthData);
+
+            IntPtr pdata = Marshal.AllocHGlobal(sizeof(short) * f.PixelDataLength);
+            try
+            {
+                f.CopyPixelDataTo(pdata, f.PixelDataLength);
+            }
+            finally
+            {
+                if (pdata != IntPtr.Zero) Marshal.FreeHGlobal(pdata);
+            }
+           // Console.WriteLine(pdata.ToInt32().ToString());
 
             //We want to build a bitmap, hence need an array of bytes
             // The size of the byte array is the width * height *4, 4 since we are doing rgba
@@ -339,7 +393,6 @@ namespace WindowsFormsApplication1
 
         private void storeDataTest()
         {
-            String m = "Hello";
             
         }
 
