@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.button1 = new System.Windows.Forms.Button();
             this.tbOutput = new System.Windows.Forms.RichTextBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -48,6 +49,8 @@
             this.SVMBtn = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.recorBtn = new System.Windows.Forms.Button();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.counterLbl = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.videoBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -265,19 +268,34 @@
             // 
             // recorBtn
             // 
-            this.recorBtn.Location = new System.Drawing.Point(291, 13);
+            this.recorBtn.Location = new System.Drawing.Point(369, 8);
             this.recorBtn.Name = "recorBtn";
-            this.recorBtn.Size = new System.Drawing.Size(141, 53);
+            this.recorBtn.Size = new System.Drawing.Size(92, 53);
             this.recorBtn.TabIndex = 22;
             this.recorBtn.Text = "Record";
             this.recorBtn.UseVisualStyleBackColor = true;
             this.recorBtn.Click += new System.EventHandler(this.recorBtn_Click);
+            // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // counterLbl
+            // 
+            this.counterLbl.AutoSize = true;
+            this.counterLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.counterLbl.Location = new System.Drawing.Point(476, 8);
+            this.counterLbl.Name = "counterLbl";
+            this.counterLbl.Size = new System.Drawing.Size(43, 48);
+            this.counterLbl.TabIndex = 23;
+            this.counterLbl.Text = "5";
             // 
             // MainFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1311, 702);
+            this.Controls.Add(this.counterLbl);
             this.Controls.Add(this.recorBtn);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.SVMBtn);
@@ -329,6 +347,8 @@
         private System.Windows.Forms.Button SVMBtn;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button recorBtn;
+        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Label counterLbl;
     }
 }
 

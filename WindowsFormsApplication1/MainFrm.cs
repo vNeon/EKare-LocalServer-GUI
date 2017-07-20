@@ -1,21 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Script.Serialization;
 using System.Windows.Forms;
 using Microsoft.Kinect;
 using Coding4Fun.Kinect.WinForm;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Runtime.InteropServices;
-using System.Threading;
 namespace WindowsFormsApplication1
 {
     public partial class MainFrm : Form
@@ -42,6 +34,9 @@ namespace WindowsFormsApplication1
         //SVM Model Object
         public SVMTest svm;
 
+
+        // Count down end time
+        DateTime endCounter;
         private double[][] trainingDataset = new double[10][];
        
         public MainFrm(String user)
@@ -454,25 +449,27 @@ namespace WindowsFormsApplication1
         /// <param name="e"></param>
         private void recorBtn_Click(object sender, EventArgs e)
         {
-            int milliseconds = 5000;
-            Thread.Sleep(milliseconds);
-            tbOutput.AppendText("START RECORDING");
-
-
-            DateTime start = DateTime.Now;
-            DateTime end = start;
-
-            double diff = (end - start).TotalSeconds;
-            while(diff < 10)
-            {
-                Console.WriteLine(diff);
-                end = DateTime.Now;
-                diff = (end - start).TotalSeconds;
-            }
-            Console.WriteLine(diff);
+            DateTime startTime = DateTime.UtcNow;
+            var seconds = 5; //countdown time
+            var start = DateTime.UtcNow; // Use UtcNow instead of Now
+            endCounter = start.AddSeconds(seconds); //endTime is a member, not a local variable
+            timer1.Enabled = true;
         }
 
-        
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            TimeSpan remainingTime = endCounter - DateTime.UtcNow;
+            if (remainingTime < TimeSpan.Zero)
+            {
+                counterLbl.Text="Started Recording!";
+                //timer1.Enabled = false;
+            }
+            else
+            {
+                counterLbl.Text = remainingTime.ToString("ss");
+            }
+        }
     }
 }
 
