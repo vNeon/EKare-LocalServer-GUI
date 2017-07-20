@@ -7,6 +7,9 @@ using Newtonsoft.Json;
 
 namespace WindowsFormsApplication1
 {
+    /// <summary>
+    /// Representing a user with basic informations
+    /// </summary>
     class User
     {
         [JsonProperty("email")]
@@ -18,8 +21,6 @@ namespace WindowsFormsApplication1
         [JsonProperty("phone")]
         public string phone { get; set; }
 
-        //[JsonProperty("contacts")]
-        //private List<KeyValuePair<string,string>> contacts { get; set; }
     }
 
 }

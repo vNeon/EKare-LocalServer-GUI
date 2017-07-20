@@ -15,7 +15,7 @@ using Coding4Fun.Kinect.WinForm;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Runtime.InteropServices;
-
+using System.Threading;
 namespace WindowsFormsApplication1
 {
     public partial class MainFrm : Form
@@ -37,13 +37,10 @@ namespace WindowsFormsApplication1
         //private float preHZ = -1;
         private long prevTs = -1;
 
-<<<<<<< HEAD
         private int counter=150;
         private int counterInputCount = 0;
-=======
         //SVM Model Object
         public SVMTest svm;
->>>>>>> c79ee0066c4a0400dfacc9b026200eed6a49a365
 
         private double[][] trainingDataset = new double[10][];
        
@@ -77,7 +74,7 @@ namespace WindowsFormsApplication1
             tbOutput.AppendText(res);
         }
 
-    
+
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -98,8 +95,28 @@ namespace WindowsFormsApplication1
             }
         }
 
+        //private void startKinectSensors()
+        //{
+        //    if (!kinect.IsRunning)
+        //    {
+        //        kinect.Start();
+        //        tbOutput.AppendText("Started Kinect!\n");
+        //    }
 
+        //    Enabling Color stream
+        //    kinect.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+        //    kinect.ColorFrameReady += Kinect_ColorFrameReady;
 
+        //    Enabling Depth stream
+        //    kinect.DepthStream.Enable();
+        //    kinect.DepthStream.Range = DepthRange.Default;
+        //    kinect.DepthFrameReady += Kinect_DepthFrameReady;
+
+        //    Enabling Skeleton tracking
+        //    kinect.SkeletonStream.Enable();
+        //    kinect.SkeletonStream.TrackingMode = SkeletonTrackingMode.Seated;
+        //    kinect.SkeletonFrameReady += Kinect_SkeletonFrameReady;
+        //}
 
         private void radioButton_CheckedChanged(object sender, EventArgs e)
         {
@@ -109,11 +126,11 @@ namespace WindowsFormsApplication1
                 if (!kinect.IsRunning)
                 {
                     kinect.Start();
-                    
+
                     tbOutput.AppendText("Started Kinect!\n");
                 }
                 kinect.DepthStream.Disable();
-              //  kinect.SkeletonStream.Disable();
+                //  kinect.SkeletonStream.Disable();
                 kinect.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
                 kinect.ColorFrameReady += Kinect_ColorFrameReady;
             }
@@ -125,11 +142,11 @@ namespace WindowsFormsApplication1
                     tbOutput.AppendText("Started Kinect!\n");
                 }
                 kinect.ColorStream.Disable();
-               // kinect.SkeletonStream.Disable();
+                // kinect.SkeletonStream.Disable();
                 kinect.DepthStream.Enable();
                 kinect.DepthStream.Range = DepthRange.Default;
                 kinect.DepthFrameReady += Kinect_DepthFrameReady;
-                
+
             }
             else
             {
@@ -197,14 +214,22 @@ namespace WindowsFormsApplication1
                             double boundingBoxWidth = Math.Abs(shoulderLeft.X - shoulderRight.X) + 0.6;
                             double boundindBoxHeight = Math.Abs(positionHead.Y - hipCenter.Y) + 1.2;
                             double[] inputArray = { headHipDiff, headDiff, timeDiff, boundindBoxHeight, boundingBoxWidth };
-                            Console.WriteLine("INPUT: " +counterInputCount);
-                            for (int i =0; i<5; i++)
+                            double[][] in1 = new double[1][];
+                            in1[0] = inputArray;
+                            int res=svm.classify(in1);
+                            if (res == 1)
                             {
-                                Console.Write(inputArray[i] + " -- ");
+                                messageSender.sendMessageToAllContact("Fall dtected " + GlobalValues.user.name);
                             }
-                            Console.WriteLine();
-                            counterInputCount++;
-                            counter = 0;
+
+                            //Console.WriteLine("INPUT: " +counterInputCount);
+                            ////for (int i =0; i<5; i++)
+                            ////{
+                            ////    Console.Write(inputArray[i] + " -- ");
+                            ////}
+                            ////Console.WriteLine();
+                            ////counterInputCount++;
+                            ////counter = 0;
                          }
                     }
 
@@ -214,7 +239,6 @@ namespace WindowsFormsApplication1
                     preHX = positionHead.X;
                     CoordinateMapper mapper = new CoordinateMapper(kinect);
                     var colorPoint = mapper.MapSkeletonPointToColorPoint(positionHead, ColorImageFormat.InfraredResolution640x480Fps30);
-
 
                 }
             }
@@ -293,6 +317,13 @@ namespace WindowsFormsApplication1
             {
                 if (pdata != IntPtr.Zero) Marshal.FreeHGlobal(pdata);
             }
+
+            Console.WriteLine(depthData.Length);
+            //for(int i =0; i <f.PixelDataLength; i++)
+            //{
+            //    Console.WriteLine(depthData[i]);
+            //}
+
            // Console.WriteLine(pdata.ToInt32().ToString());
 
             //We want to build a bitmap, hence need an array of bytes
@@ -403,7 +434,7 @@ namespace WindowsFormsApplication1
 
         private void SVMBtn_Click(object sender, EventArgs e)
         {
-            svm = new SVMTest(@"C:\Users\n\Desktop\examples.xls");
+            svm = new SVMTest(@"C:\Users\johnn\Desktop\trainingdata.xlsx");
             svm.buildModel();
         }
 
@@ -411,9 +442,37 @@ namespace WindowsFormsApplication1
         {
             if (svm != null)
             {
-                svm.classify();
+                svm.classify(new double[1][]);
             }
         }
+
+        /// <summary>
+        /// 
+        /// Start record after 5 second
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void recorBtn_Click(object sender, EventArgs e)
+        {
+            int milliseconds = 5000;
+            Thread.Sleep(milliseconds);
+            tbOutput.AppendText("START RECORDING");
+
+
+            DateTime start = DateTime.Now;
+            DateTime end = start;
+
+            double diff = (end - start).TotalSeconds;
+            while(diff < 10)
+            {
+                Console.WriteLine(diff);
+                end = DateTime.Now;
+                diff = (end - start).TotalSeconds;
+            }
+            Console.WriteLine(diff);
+        }
+
+        
     }
 }
 

@@ -1,26 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 namespace WindowsFormsApplication1
 {
+    /// <summary>
+    ///  This class represents a message object
+    ///  This object is serialized to a Json document and posted to Firebase database
+    /// </summary>
     class Message
     {
         [JsonProperty("sender")]
         public string sender { get; set; }
         [JsonProperty("message")]
         public string message { get; set; }
-        [JsonProperty("timeDate")]
-        public string timeDate { get; set; }
+        [JsonProperty("time")]
+        public string time { get; set; }
+        [JsonProperty("date")]
+        public string date { get; set; }
         [JsonProperty("imageURL")]
         public string imageURL { get; set; }
 
         public Message(string message, string sender, string imageURL)
         {
             this.message = message;
-            this.timeDate = DateTime.Now.ToString();
+            this.time = DateTime.Now.ToString("hh:mm:ss tt");
+            this.date = DateTime.Now.ToString("MMM dd");
             this.sender = sender;
             this.imageURL = imageURL;
         }

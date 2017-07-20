@@ -47,6 +47,7 @@
             this.sendMessageBtn = new System.Windows.Forms.Button();
             this.SVMBtn = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
+            this.recorBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.videoBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -57,7 +58,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.button1.Location = new System.Drawing.Point(1003, 47);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(133, 37);
+            this.button1.Size = new System.Drawing.Size(133, 38);
             this.button1.TabIndex = 0;
             this.button1.Text = "Send Notification";
             this.button1.UseVisualStyleBackColor = true;
@@ -70,7 +71,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbOutput.Location = new System.Drawing.Point(967, 194);
             this.tbOutput.Name = "tbOutput";
-            this.tbOutput.Size = new System.Drawing.Size(328, 377);
+            this.tbOutput.Size = new System.Drawing.Size(328, 438);
             this.tbOutput.TabIndex = 2;
             this.tbOutput.Text = "";
             // 
@@ -141,14 +142,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.videoBox.Location = new System.Drawing.Point(38, 91);
             this.videoBox.Name = "videoBox";
-            this.videoBox.Size = new System.Drawing.Size(920, 480);
+            this.videoBox.Size = new System.Drawing.Size(920, 541);
             this.videoBox.TabIndex = 10;
             this.videoBox.TabStop = false;
             // 
             // radioButton1
             // 
             this.radioButton1.AutoSize = true;
-            this.radioButton1.Location = new System.Drawing.Point(164, 592);
+            this.radioButton1.Location = new System.Drawing.Point(164, 668);
             this.radioButton1.Name = "radioButton1";
             this.radioButton1.Size = new System.Drawing.Size(50, 21);
             this.radioButton1.TabIndex = 11;
@@ -160,7 +161,7 @@
             // radioButton2
             // 
             this.radioButton2.AutoSize = true;
-            this.radioButton2.Location = new System.Drawing.Point(314, 592);
+            this.radioButton2.Location = new System.Drawing.Point(327, 668);
             this.radioButton2.Name = "radioButton2";
             this.radioButton2.Size = new System.Drawing.Size(105, 21);
             this.radioButton2.TabIndex = 12;
@@ -172,7 +173,7 @@
             // radioButton4
             // 
             this.radioButton4.AutoSize = true;
-            this.radioButton4.Location = new System.Drawing.Point(518, 592);
+            this.radioButton4.Location = new System.Drawing.Point(519, 668);
             this.radioButton4.Name = "radioButton4";
             this.radioButton4.Size = new System.Drawing.Size(58, 21);
             this.radioButton4.TabIndex = 14;
@@ -184,7 +185,7 @@
             // skeletonCB
             // 
             this.skeletonCB.AutoSize = true;
-            this.skeletonCB.Location = new System.Drawing.Point(731, 592);
+            this.skeletonCB.Location = new System.Drawing.Point(731, 669);
             this.skeletonCB.Name = "skeletonCB";
             this.skeletonCB.Size = new System.Drawing.Size(101, 21);
             this.skeletonCB.TabIndex = 15;
@@ -236,7 +237,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.sendMessageBtn.Location = new System.Drawing.Point(1142, 47);
             this.sendMessageBtn.Name = "sendMessageBtn";
-            this.sendMessageBtn.Size = new System.Drawing.Size(133, 37);
+            this.sendMessageBtn.Size = new System.Drawing.Size(133, 38);
             this.sendMessageBtn.TabIndex = 19;
             this.sendMessageBtn.Text = "Send Message";
             this.sendMessageBtn.UseVisualStyleBackColor = true;
@@ -262,11 +263,22 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // recorBtn
+            // 
+            this.recorBtn.Location = new System.Drawing.Point(291, 13);
+            this.recorBtn.Name = "recorBtn";
+            this.recorBtn.Size = new System.Drawing.Size(141, 53);
+            this.recorBtn.TabIndex = 22;
+            this.recorBtn.Text = "Record";
+            this.recorBtn.UseVisualStyleBackColor = true;
+            this.recorBtn.Click += new System.EventHandler(this.recorBtn_Click);
+            // 
             // MainFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1311, 641);
+            this.ClientSize = new System.Drawing.Size(1311, 702);
+            this.Controls.Add(this.recorBtn);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.SVMBtn);
             this.Controls.Add(this.sendMessageBtn);
@@ -316,6 +328,7 @@
         private System.Windows.Forms.Button sendMessageBtn;
         private System.Windows.Forms.Button SVMBtn;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button recorBtn;
     }
 }
 

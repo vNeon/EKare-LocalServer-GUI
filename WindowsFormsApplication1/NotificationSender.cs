@@ -8,6 +8,9 @@ using System.Web.Script.Serialization;
 using System.IO;
 namespace WindowsFormsApplication1
 {
+    /// <summary>
+    /// This class send realtime notifications to the android app
+    /// </summary>
     class NotificationSender
     {
         //Send notification to a topic 

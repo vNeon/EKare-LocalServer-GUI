@@ -23,8 +23,8 @@ public class SVMTest
         DataTable table = new Accord.IO.ExcelReader(fileLocation).GetWorksheet("Classification - Yin Yang");
 
         // Convert the DataTable to input and output vectors
-        this.inputs = table.ToJagged<double>("X", "Y");
-        this.outputs = table.Columns["G"].ToArray<int>();
+        this.inputs = table.ToJagged<double>("HeadHip", "HeadHead","Time","Bheight","Bwidth");
+        this.outputs = table.Columns["Class"].ToArray<int>();
 
         ScatterplotBox.Show("Yin-Yang", inputs, outputs).Hold();
     }
@@ -37,18 +37,19 @@ public class SVMTest
         return svmModel;
     }
 
-    public int classify()
+    public int classify(double[][] inputs)
     {
+        int[] zeroOneAnswers = { 0 };
         if (svmModel != null)
         {
             bool[] answers = svmModel.Decide(inputs);
-            int[] zeroOneAnswers = answers.ToZeroOne();
+            zeroOneAnswers = answers.ToZeroOne();
 
             ScatterplotBox.Show("Expected results", inputs, outputs);
             ScatterplotBox.Show("LinearSVM results", inputs, zeroOneAnswers);
         }
         
-        return 0;
+        return zeroOneAnswers[0];
     }
 
     public void test()
