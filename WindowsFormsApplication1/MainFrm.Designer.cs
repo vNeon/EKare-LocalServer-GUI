@@ -51,6 +51,8 @@
             this.recorBtn = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.counterLbl = new System.Windows.Forms.Label();
+            this.saveBtn = new System.Windows.Forms.Button();
+            this.fallornahCb = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.videoBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -268,7 +270,7 @@
             // 
             // recorBtn
             // 
-            this.recorBtn.Location = new System.Drawing.Point(369, 8);
+            this.recorBtn.Location = new System.Drawing.Point(410, 4);
             this.recorBtn.Name = "recorBtn";
             this.recorBtn.Size = new System.Drawing.Size(92, 53);
             this.recorBtn.TabIndex = 22;
@@ -284,17 +286,39 @@
             // 
             this.counterLbl.AutoSize = true;
             this.counterLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.counterLbl.Location = new System.Drawing.Point(476, 8);
+            this.counterLbl.Location = new System.Drawing.Point(524, 9);
             this.counterLbl.Name = "counterLbl";
             this.counterLbl.Size = new System.Drawing.Size(43, 48);
             this.counterLbl.TabIndex = 23;
             this.counterLbl.Text = "5";
+            // 
+            // saveBtn
+            // 
+            this.saveBtn.Location = new System.Drawing.Point(1003, 645);
+            this.saveBtn.Name = "saveBtn";
+            this.saveBtn.Size = new System.Drawing.Size(254, 44);
+            this.saveBtn.TabIndex = 24;
+            this.saveBtn.Text = "Save-Csv";
+            this.saveBtn.UseVisualStyleBackColor = true;
+            this.saveBtn.Click += new System.EventHandler(this.saveBtn_Click);
+            // 
+            // fallornahCb
+            // 
+            this.fallornahCb.AutoSize = true;
+            this.fallornahCb.Location = new System.Drawing.Point(503, 64);
+            this.fallornahCb.Name = "fallornahCb";
+            this.fallornahCb.Size = new System.Drawing.Size(94, 21);
+            this.fallornahCb.TabIndex = 25;
+            this.fallornahCb.Text = "fall/not fall";
+            this.fallornahCb.UseVisualStyleBackColor = true;
             // 
             // MainFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1311, 702);
+            this.Controls.Add(this.fallornahCb);
+            this.Controls.Add(this.saveBtn);
             this.Controls.Add(this.counterLbl);
             this.Controls.Add(this.recorBtn);
             this.Controls.Add(this.button2);
@@ -349,6 +373,8 @@
         private System.Windows.Forms.Button recorBtn;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label counterLbl;
+        private System.Windows.Forms.Button saveBtn;
+        private System.Windows.Forms.CheckBox fallornahCb;
     }
 }
 
