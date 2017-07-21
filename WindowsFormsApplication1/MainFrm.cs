@@ -16,6 +16,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Collections;
+
 namespace WindowsFormsApplication1
 {
     public partial class MainFrm : Form
@@ -30,19 +32,14 @@ namespace WindowsFormsApplication1
         private const float MinDepthDistance = 850;
         private const float MaxDepthDistanceOffset = MaxDepthDistance - MinDepthDistance;
 
-        //HEAD postions:
-        private SkeletonPoint prevH;
-        private float preHX = -1;
-        private float preHY = -1;
-        //private float preHZ = -1;
-        private long prevTs = -1;
-
-        private int counter=150;
-        private int counterInputCount = 0;
         //SVM Model Object
         public SVMTest svm;
 
-        private double[][] trainingDataset = new double[10][];
+
+        private int frameCounter=0;
+        private int nullFrameCounter=0;
+
+        private List<float> fiveSecondData = new List<float>();
        
         public MainFrm(String user)
         {
@@ -173,73 +170,123 @@ namespace WindowsFormsApplication1
         {
             using (SkeletonFrame f = e.OpenSkeletonFrame())
             {
-                counter++;
                 if (f == null)
                 {
+                    nullFrameCounter++;
                     return;
                 }
-                var skeletons = new Skeleton[f.SkeletonArrayLength];
-                f.CopySkeletonDataTo(skeletons);
-
-                //Find the first person to track
-                var trackedPerson = skeletons.FirstOrDefault(s => s.TrackingState == SkeletonTrackingState.Tracked);
-
-                long timeNow = Convert.ToInt64( f.Timestamp.ToString());
-
-                if (trackedPerson != null)
+                else
                 {
-                    SkeletonPoint positionHead = trackedPerson.Joints[JointType.Head].Position;
-                    SkeletonPoint positionHip = trackedPerson.Joints[JointType.HipCenter].Position;
-                    headXlbl.Text = positionHead.X.ToString();
-                    headYlbl.Text = positionHead.Y.ToString();
-                    headZlbl.Text = positionHead.Z.ToString();
-                    SkeletonPoint shoulderLeft = trackedPerson.Joints[JointType.ShoulderLeft].Position;
-                    SkeletonPoint shoulderRight = trackedPerson.Joints[JointType.ShoulderRight].Position;
-                    SkeletonPoint hipCenter = trackedPerson.Joints[JointType.HipCenter].Position;
-                    if (preHX ==-1)
-                    {
-                    }
-                    else
-                    {
-                        Console.WriteLine(counter);
-                        if (counter >= 150) {
-                            
-                            double headHipDiff = Math.Sqrt(Math.Pow(positionHead.X - positionHip.X, 2) + Math.Pow(positionHead.Y - positionHip.Y, 2)
-                                                    + Math.Pow(positionHead.Y - positionHip.Y, 2));
-                            double headDiff = Math.Sqrt(Math.Pow(positionHead.X - prevH.X, 2) + Math.Pow(positionHead.Y - prevH.Y, 2)
-                                                    + Math.Pow(positionHead.Y - prevH.Y, 2));
+                    var skeletons = new Skeleton[f.SkeletonArrayLength];
+                    f.CopySkeletonDataTo(skeletons);
+                    //counterLbl.Text = DateTime.UtcNow.ToString("ss");
+                    // Find the first person to track
+                    var trackedPerson = skeletons.FirstOrDefault(s => s.TrackingState == SkeletonTrackingState.Tracked);
 
-                            long timeDiff = timeNow - prevTs;
-
-                            double boundingBoxWidth = Math.Abs(shoulderLeft.X - shoulderRight.X) + 0.6;
-                            double boundindBoxHeight = Math.Abs(positionHead.Y - hipCenter.Y) + 1.2;
-                            double[] inputArray = { headHipDiff, headDiff, timeDiff, boundindBoxHeight, boundingBoxWidth };
-                            double[][] in1 = new double[1][];
-                            in1[0] = inputArray;
-                            int res=svm.classify(in1);
-                            if (res == 1)
+                    if (trackedPerson != null)
+                    {
+                        if (frameCounter > 150)
+                        {
+                            fiveSecondData.Clear();
+                            frameCounter = 0;
+                        }
+                        else
+                        {
+                            frameCounter++;
+                            // Record every fifth frame
+                            if (frameCounter % 5 == 0)
                             {
-                                messageSender.sendMessageToAllContact("Fall dtected " + GlobalValues.user.name);
+                                float maxY = -1000;
+                                float minY = -1000;
+                                float maxX = -1000;
+                                float minX = -1000;
+                                float maxZ = -1000;
+                                float minZ = -1000;
+                                foreach (Joint joint in trackedPerson.Joints)
+                                {
+                                    //Console.WriteLine(joint.JointType);
+                                    if (joint.JointType == JointType.HipCenter || joint.JointType == JointType.Spine ||
+                                       joint.JointType == JointType.Head || joint.JointType == JointType.KneeLeft ||
+                                       joint.JointType == JointType.KneeRight)
+                                    {
+                                        fiveSecondData.Add(joint.Position.X);
+                                        fiveSecondData.Add(joint.Position.Y);
+                                        fiveSecondData.Add(joint.Position.Z);
+                                    }
+                                    // Find the max and min coordiates in the X axis
+                                    if (maxY == -1000)
+                                    {
+                                        maxY = joint.Position.Y;
+                                        minY = maxY;
+                                        maxX = joint.Position.X;
+                                        minX = maxX;
+                                        maxZ = joint.Position.Z;
+                                        minZ = maxZ;
+
+                                    }
+                                    else
+                                    {
+                                        if (maxX < joint.Position.X)
+                                        {
+                                            maxX = joint.Position.X;
+                                        }
+                                        if (minX > joint.Position.X)
+                                        {
+                                            minX = joint.Position.X;
+                                        }
+                                        // Find the max and min cooridates in the Y axis
+                                        if (maxY < joint.Position.Y)
+                                        {
+                                            maxY = joint.Position.Y;
+                                        }
+                                        if (minY > joint.Position.Y)
+                                        {
+                                            minY = joint.Position.Y;
+                                        }
+                                        // Find the max and min cooridates in the Z axis
+                                        if (maxZ < joint.Position.Z)
+                                        {
+                                            maxZ = joint.Position.Z;
+                                        }
+                                        if (minZ > joint.Position.Z)
+                                        {
+                                            minZ = joint.Position.Z;
+                                        }
+                                    }
+                                }
+                                fiveSecondData.Add(Math.Abs(maxX - minX)); // The width of the bounding box 
+                                fiveSecondData.Add(Math.Abs(maxY - minY)); // The height of the bounding box
+                                fiveSecondData.Add(Math.Abs(maxZ - minZ)); // The depth of the bounding box
+                                fiveSecondData.Add(Convert.ToSingle(f.Timestamp));
+                                
+                                if(frameCounter == 150)
+                                {
+                                    Console.WriteLine(fiveSecondData.Count);
+                                    // MACHINE LEARNING TO DETECT FALL HERE
+                                    // SHOULD CALL ANOTHER FUNCTION
+                                    // MAYBE ON A DIFFERENT THREAD 
+                                }
+                                
+                                // Console.WriteLine("Frame no " + frameCounter + " :" + String.Join(",", (string[])data.ToArray(Type.GetType("System.String"))));
+                                //String s = String.Empty;
+                                //foreach (float fl in data)
+                                //{
+                                //    s += fl.ToString() + ",";
+                                //}
+                                ////builderForSingleScenario.Append(s);
+                                //if (frameCounter == 150)
+                                //{
+                                //    //builderForSingleScenario.AppendLine(fallornahCb.Checked ? "1" : "0");
+                                //    //builderForCsv.AppendLine(builderForSingleScenario.ToString());
+                                //}
+                                //Console.WriteLine(s);
+
                             }
+                            frameCounter += nullFrameCounter;
+                            nullFrameCounter = 0;
+                        }
 
-                            //Console.WriteLine("INPUT: " +counterInputCount);
-                            ////for (int i =0; i<5; i++)
-                            ////{
-                            ////    Console.Write(inputArray[i] + " -- ");
-                            ////}
-                            ////Console.WriteLine();
-                            ////counterInputCount++;
-                            ////counter = 0;
-                         }
                     }
-
-                    // update previous values
-                    prevTs = timeNow;
-                    prevH = positionHead;
-                    preHX = positionHead.X;
-                    CoordinateMapper mapper = new CoordinateMapper(kinect);
-                    var colorPoint = mapper.MapSkeletonPointToColorPoint(positionHead, ColorImageFormat.InfraredResolution640x480Fps30);
-
                 }
             }
         }
@@ -412,21 +459,6 @@ namespace WindowsFormsApplication1
 
         }
 
-        private void DetectFall(SkeletonPoint head, SkeletonPoint hip)
-        {
-            if(Math.Abs(head.Y - hip.Y) <= 0.1 || (preHY -head.Y) >= 0.5  )
-            {
-                notifier.SendNotification();
-                tbOutput.AppendText("Fall detected");
-            }else
-            {
-                tbOutput.AppendText(Math.Abs(head.Y - hip.Y).ToString() + " ---- " + Math.Abs(preHY - head.Y).ToString());
-            }
-
-
-        }
-        
-
         private void storeDataTest()
         {
             
@@ -445,34 +477,6 @@ namespace WindowsFormsApplication1
                 svm.classify(new double[1][]);
             }
         }
-
-        /// <summary>
-        /// 
-        /// Start record after 5 second
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void recorBtn_Click(object sender, EventArgs e)
-        {
-            int milliseconds = 5000;
-            Thread.Sleep(milliseconds);
-            tbOutput.AppendText("START RECORDING");
-
-
-            DateTime start = DateTime.Now;
-            DateTime end = start;
-
-            double diff = (end - start).TotalSeconds;
-            while(diff < 10)
-            {
-                Console.WriteLine(diff);
-                end = DateTime.Now;
-                diff = (end - start).TotalSeconds;
-            }
-            Console.WriteLine(diff);
-        }
-
-        
     }
 }
 

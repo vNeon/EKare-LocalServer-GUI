@@ -47,7 +47,6 @@
             this.sendMessageBtn = new System.Windows.Forms.Button();
             this.SVMBtn = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
-            this.recorBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.videoBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -263,22 +262,11 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
-            // recorBtn
-            // 
-            this.recorBtn.Location = new System.Drawing.Point(291, 13);
-            this.recorBtn.Name = "recorBtn";
-            this.recorBtn.Size = new System.Drawing.Size(141, 53);
-            this.recorBtn.TabIndex = 22;
-            this.recorBtn.Text = "Record";
-            this.recorBtn.UseVisualStyleBackColor = true;
-            this.recorBtn.Click += new System.EventHandler(this.recorBtn_Click);
-            // 
             // MainFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1311, 702);
-            this.Controls.Add(this.recorBtn);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.SVMBtn);
             this.Controls.Add(this.sendMessageBtn);
@@ -328,7 +316,6 @@
         private System.Windows.Forms.Button sendMessageBtn;
         private System.Windows.Forms.Button SVMBtn;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button recorBtn;
     }
 }
 

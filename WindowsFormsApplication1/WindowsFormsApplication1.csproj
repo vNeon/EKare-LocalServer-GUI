@@ -138,7 +138,6 @@
       <DependentUpon>LoginFrm.cs</DependentUpon>
     </Compile>
     <Compile Include="Message.cs" />
-    <Compile Include="MessageLog.cs" />
     <Compile Include="MessageSender.cs" />
     <Compile Include="NotificationSender.cs" />
     <Compile Include="Program.cs" />
