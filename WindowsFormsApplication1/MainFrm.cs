@@ -89,7 +89,7 @@ namespace WindowsFormsApplication1
 
                 // assert the column names for the csv file
                 StringBuilder columns = new StringBuilder();
-                for(int i =1; i<=50; i++)
+                for(int i =1; i<=30; i++)
                 {
                     string names = "";
                     names += "HC_X_" + i + ",";
@@ -211,13 +211,13 @@ namespace WindowsFormsApplication1
 
                     if (trackedPerson != null)
                     {
-                        if(frameCounter > 300)
+                        if(frameCounter > 150)
                         {
                             counterLbl.Text = "Finished Recording!";
                             return;
                         }
                         frameCounter++;
-                        if (frameCounter % 6 == 0)
+                        if (frameCounter % 5 == 0)
                         {
                             ArrayList data = new ArrayList();
                             float maxY =-1000;
@@ -289,7 +289,7 @@ namespace WindowsFormsApplication1
                                 s += fl.ToString() + ",";
                             }
                             builderForSingleScenario.Append(s);
-                            if(frameCounter == 300)
+                            if(frameCounter == 150)
                             {
                                 builderForSingleScenario.AppendLine(fallornahCb.Checked ? "1":"0");
                                 builderForCsv.AppendLine(builderForSingleScenario.ToString());
