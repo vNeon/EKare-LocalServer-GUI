@@ -212,7 +212,6 @@ namespace WindowsFormsApplication1
 
                     if (trackedPerson != null)
                     {
-                        Console.WriteLine(frameCounter);
                         if(frameCounter > 150)
                         {
                             radioButton4.Checked = true;
@@ -562,7 +561,7 @@ namespace WindowsFormsApplication1
 
         private void removeBtn_Click(object sender, EventArgs e)
         {
-            builderForCsv.Remove(builderForCsv.Length - prevLen, prevLen);
+            builderForCsv.Remove(builderForCsv.Length-1 - prevLen-1, prevLen);
             Console.WriteLine(builderForCsv.ToString());
         }
     }
