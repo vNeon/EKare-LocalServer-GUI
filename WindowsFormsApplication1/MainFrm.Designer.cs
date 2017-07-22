@@ -53,6 +53,7 @@
             this.counterLbl = new System.Windows.Forms.Label();
             this.saveBtn = new System.Windows.Forms.Button();
             this.fallornahCb = new System.Windows.Forms.CheckBox();
+            this.removeBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.videoBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -296,7 +297,7 @@
             // 
             this.saveBtn.Location = new System.Drawing.Point(1003, 645);
             this.saveBtn.Name = "saveBtn";
-            this.saveBtn.Size = new System.Drawing.Size(254, 44);
+            this.saveBtn.Size = new System.Drawing.Size(116, 44);
             this.saveBtn.TabIndex = 24;
             this.saveBtn.Text = "Save-Csv";
             this.saveBtn.UseVisualStyleBackColor = true;
@@ -312,11 +313,22 @@
             this.fallornahCb.Text = "fall/not fall";
             this.fallornahCb.UseVisualStyleBackColor = true;
             // 
+            // removeBtn
+            // 
+            this.removeBtn.Location = new System.Drawing.Point(1142, 645);
+            this.removeBtn.Name = "removeBtn";
+            this.removeBtn.Size = new System.Drawing.Size(95, 44);
+            this.removeBtn.TabIndex = 26;
+            this.removeBtn.Text = "Remove last ";
+            this.removeBtn.UseVisualStyleBackColor = true;
+            this.removeBtn.Click += new System.EventHandler(this.removeBtn_Click);
+            // 
             // MainFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1311, 702);
+            this.Controls.Add(this.removeBtn);
             this.Controls.Add(this.fallornahCb);
             this.Controls.Add(this.saveBtn);
             this.Controls.Add(this.counterLbl);
@@ -375,6 +387,7 @@
         private System.Windows.Forms.Label counterLbl;
         private System.Windows.Forms.Button saveBtn;
         private System.Windows.Forms.CheckBox fallornahCb;
+        private System.Windows.Forms.Button removeBtn;
     }
 }
 

@@ -31,7 +31,8 @@ namespace WindowsFormsApplication1
         //SVM Model Object
         public SVMTest svm;
 
-
+        int prevLen = 0;
+        long initializedTimestamp = 0;
         // Count down end time
         DateTime endCounter;
 
@@ -211,10 +212,17 @@ namespace WindowsFormsApplication1
 
                     if (trackedPerson != null)
                     {
+                        Console.WriteLine(frameCounter);
                         if(frameCounter > 150)
                         {
+                            radioButton4.Checked = true;
+                            kinect.SkeletonFrameReady -= Kinect_SkeletonFrameReady;
+                            kinect.SkeletonStream.Disable();
                             counterLbl.Text = "Finished Recording!";
                             return;
+                        }else if(frameCounter == 0)
+                        {
+                            initializedTimestamp = f.Timestamp;
                         }
                         frameCounter++;
                         if (frameCounter % 5 == 0)
@@ -281,7 +289,7 @@ namespace WindowsFormsApplication1
                             data.Add(Math.Abs(maxX - minX)); // The width of the bounding box 
                             data.Add(Math.Abs(maxY - minY)); // The height of the bounding box
                             data.Add(Math.Abs(maxZ - minZ)); // The depth of the bounding box
-                            data.Add(Convert.ToSingle(f.Timestamp));
+                            data.Add(Convert.ToSingle(f.Timestamp -initializedTimestamp));
                             // Console.WriteLine("Frame no " + frameCounter + " :" + String.Join(",", (string[])data.ToArray(Type.GetType("System.String"))));
                             String s = String.Empty;
                             foreach (float fl in data)
@@ -292,9 +300,10 @@ namespace WindowsFormsApplication1
                             if(frameCounter == 150)
                             {
                                 builderForSingleScenario.AppendLine(fallornahCb.Checked ? "1":"0");
+                                prevLen=builderForSingleScenario.Length;
                                 builderForCsv.AppendLine(builderForSingleScenario.ToString());
                             }
-                            Console.WriteLine(s);
+                            Console.WriteLine("Frame "+frameCounter+" :"+s);
 
                         }
                         frameCounter += nullframe;
@@ -517,7 +526,7 @@ namespace WindowsFormsApplication1
             if (remainingTime < TimeSpan.Zero)
             {
                 counterLbl.Text="Started Recording!";
-                skeletonCB.Checked = true;
+                //skeletonCB.Checked = true;
                 radioButton1.Checked = true;
                 enableSkeleton();
                 timer1.Enabled = false;
@@ -549,6 +558,12 @@ namespace WindowsFormsApplication1
             }
             Console.WriteLine(csvPath);
             File.AppendAllText(csvPath, builderForCsv.ToString());
+        }
+
+        private void removeBtn_Click(object sender, EventArgs e)
+        {
+            builderForCsv.Remove(builderForCsv.Length - prevLen, prevLen);
+            Console.WriteLine(builderForCsv.ToString());
         }
     }
 }
