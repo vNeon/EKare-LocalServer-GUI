@@ -123,6 +123,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Contact.cs" />
     <Compile Include="FirebaseRequest.cs" />
     <Compile Include="GlobalValues.cs" />
     <Compile Include="MainFrm.cs">

@@ -47,12 +47,12 @@ namespace WindowsFormsApplication1
             foreach (String key in GlobalValues.contacts.Keys)
             {
                 //TODO HAVE TO CHANGE MESSAGE-LOG TO MESSAGE_LOG
-                String URI = GlobalValues.FBRTDBURI + "/message-log/" + key + "/messages.json?auth=" + GlobalValues.dbSecret;
+                String URI = GlobalValues.FBRTDBURI + "/"+Table.message_log.ToString()+"/" + key + "/messages.json?auth=" + GlobalValues.dbSecret;
                 FirebaseRequest postMessage = new FirebaseRequest(URI, httpMethod.POST);
                 postMessage.executePostRequest(mes);
 
                 //Update the latest message and timestamp
-                String URImessageLog = GlobalValues.FBRTDBURI + "/message-log/"+key+".json?auth=" + GlobalValues.dbSecret;
+                String URImessageLog = GlobalValues.FBRTDBURI + "/" + Table.message_log.ToString() + "/" + key+".json?auth=" + GlobalValues.dbSecret;
                 FirebaseRequest postMessageLog = new FirebaseRequest(URImessageLog, httpMethod.POST);
 
                 postMessageLog.updateMesssageLog(updateInfo);

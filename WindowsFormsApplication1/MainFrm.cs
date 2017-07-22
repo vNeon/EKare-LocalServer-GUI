@@ -85,7 +85,7 @@ namespace WindowsFormsApplication1
                 lblConnectionID.Text = kinect.DeviceConnectionId;
                 tbOutput.AppendText("Found kinectID: " + kinect.DeviceConnectionId + "\n");
                 //kinect.DepthStream.Enable();
-                kinect.SkeletonStream.Enable();
+                //kinect.SkeletonStream.Enable();
                 //kinect.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
 
 
@@ -148,6 +148,8 @@ namespace WindowsFormsApplication1
             else
             {
                 kinect.Stop();
+                kinect.DepthFrameReady -= Kinect_DepthFrameReady;
+                kinect.ColorFrameReady -= Kinect_ColorFrameReady;
                 tbOutput.AppendText("Stopped Kinect!\n");
                 lblConnectionID.Text = "-";
                 videoBox.Image = null;

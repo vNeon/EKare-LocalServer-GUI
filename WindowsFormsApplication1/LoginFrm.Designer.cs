@@ -61,7 +61,7 @@
             this.emailTb.Name = "emailTb";
             this.emailTb.Size = new System.Drawing.Size(213, 22);
             this.emailTb.TabIndex = 2;
-            this.emailTb.Text = "test1@gmail.com";
+            this.emailTb.Text = "kj@gmail.com";
             // 
             // label3
             // 

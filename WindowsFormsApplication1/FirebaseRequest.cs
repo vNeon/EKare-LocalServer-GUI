@@ -85,7 +85,6 @@ namespace WindowsFormsApplication1
                             using (StreamReader reader = new StreamReader(resStream))
                             {
                                 responseString = reader.ReadToEnd();
-                                Console.WriteLine(responseString);
                             }
                         }
                     }

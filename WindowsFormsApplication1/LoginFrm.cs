@@ -82,7 +82,7 @@ namespace WindowsFormsApplication1
             Console.WriteLine(res);
             if (res != null && res != "")
             {
-                Dictionary<String, String> jsonTemp = JsonConvert.DeserializeObject<Dictionary<String, String>>(res);
+                Dictionary<String, Contact> jsonTemp = JsonConvert.DeserializeObject<Dictionary<String, Contact>>(res);
                 GlobalValues.contacts = jsonTemp;
             }
         }
