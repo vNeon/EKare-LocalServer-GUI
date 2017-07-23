@@ -43,7 +43,7 @@ namespace WindowsFormsApplication1
             }
 
             // construct the update message in Json format
-            string updateInfo = "{\"lastmessage\":\""+lastMessage+"\",\"date\":\""+mes.date+"\"}";
+            string updateInfo = "{\"lastMessage\":\""+lastMessage+"\",\"date\":\""+mes.date+"\"}";
             foreach (String key in GlobalValues.contacts.Keys)
             {
                 //TODO HAVE TO CHANGE MESSAGE-LOG TO MESSAGE_LOG
@@ -52,7 +52,8 @@ namespace WindowsFormsApplication1
                 postMessage.executePostRequest(mes);
 
                 //Update the latest message and timestamp
-                String URImessageLog = GlobalValues.FBRTDBURI + "/" + Table.message_log.ToString() + "/" + key+".json?auth=" + GlobalValues.dbSecret;
+                String URImessageLog = GlobalValues.FBRTDBURI + "/" + Table.users.ToString() + "/" +GlobalValues.userID+
+                                       "/"+Table.contacts.ToString()+"/"+ key+".json?auth=" + GlobalValues.dbSecret;
                 FirebaseRequest postMessageLog = new FirebaseRequest(URImessageLog, httpMethod.POST);
 
                 postMessageLog.updateMesssageLog(updateInfo);

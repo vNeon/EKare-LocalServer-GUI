@@ -10,7 +10,8 @@ namespace WindowsFormsApplication1
     public enum Table
     {
         users,
-        message_log
+        message_log,
+        contacts
     }
     /// <summary>
     /// This class is a collection of values that are unlikely to change and sharable between different classes
