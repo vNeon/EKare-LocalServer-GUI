@@ -4,6 +4,7 @@ using Accord.Math;
 using Accord.Statistics;
 using Accord.MachineLearning.VectorMachines.Learning;
 using System.Data;
+using System.Collections;
 
 public class SVMTest
 {
@@ -20,13 +21,36 @@ public class SVMTest
     public SVMTest(string fileLocation)
     {
         // Read the Excel worksheet into a DataTable
-        DataTable table = new Accord.IO.ExcelReader(fileLocation).GetWorksheet("Classification - Yin Yang");
-
+        DataTable table = new Accord.IO.ExcelReader(fileLocation).GetWorksheet("Sheet1");
+        ArrayList columns = new ArrayList();
+        for (int i = 1; i <= 30; i++)
+        {
+            columns.Add("HC_X_" + i);
+            columns.Add("HC_Y_" + i);
+            columns.Add("HC_Z_" + i);
+            columns.Add("S_X_" + i);
+            columns.Add("S_Y_" + i);
+            columns.Add("S_Z_" + i);
+            columns.Add("H_X_" + i);
+            columns.Add("H_Y_" + i);
+            columns.Add("H_Z_" + i);
+            columns.Add("KL_X_" + i);
+            columns.Add("KL_Y_" + i );
+            columns.Add("KL_Z_" + i);
+            columns.Add("KR_X_" + i);
+            columns.Add("KR_Y_" + i);
+            columns.Add("KR_Z_" + i);
+            columns.Add("BBW_" + i);
+            columns.Add("BBH_" + i);
+            columns.Add("BBD_" + i);
+            columns.Add("TS_" + i);
+        }
+        columns.Add("Class");
         // Convert the DataTable to input and output vectors
-        this.inputs = table.ToJagged<double>("HeadHip", "HeadHead","Time","Bheight","Bwidth");
+        this.inputs = table.ToJagged<double>(columns.ToArray(typeof(string)) as string[]);
         this.outputs = table.Columns["Class"].ToArray<int>();
 
-        ScatterplotBox.Show("Yin-Yang", inputs, outputs).Hold();
+        //ScatterplotBox.Show("Yin-Yang", inputs, outputs).Hold();
     }
 
     public Accord.MachineLearning.VectorMachines.SupportVectorMachine buildModel()
@@ -39,7 +63,7 @@ public class SVMTest
 
     public int classify(double[][] inputs)
     {
-        int[] zeroOneAnswers = { 0 };
+        int[] zeroOneAnswers={0};
         if (svmModel != null)
         {
             bool[] answers = svmModel.Decide(inputs);

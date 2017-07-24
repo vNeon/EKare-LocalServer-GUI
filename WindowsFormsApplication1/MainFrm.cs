@@ -39,7 +39,7 @@ namespace WindowsFormsApplication1
         private int frameCounter=0;
         private int nullFrameCounter=0;
 
-        private List<float> fiveSecondData = new List<float>();
+        private List<double> fiveSecondData = new List<double>();
        
         public MainFrm(String user)
         {
@@ -267,6 +267,16 @@ namespace WindowsFormsApplication1
                                     // MACHINE LEARNING TO DETECT FALL HERE
                                     // SHOULD CALL ANOTHER FUNCTION
                                     // MAYBE ON A DIFFERENT THREAD 
+                                    double[][] input = new double[1][];
+                                    input[0] = fiveSecondData.ToArray() as double[];
+                                    int res = svm.classify(input);
+                                    if(res == 1)
+                                    {
+                                        tbOutput.AppendText("Fall detected");
+                                    }else
+                                    {
+                                        tbOutput.AppendText("Not Fall");
+                                    }
                                 }
                                 
                                 // Console.WriteLine("Frame no " + frameCounter + " :" + String.Join(",", (string[])data.ToArray(Type.GetType("System.String"))));
