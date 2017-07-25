@@ -1,10 +1,14 @@
-﻿using Accord.Controls;
+﻿using System;
+using Accord.Controls;
 using Accord.IO;
 using Accord.Math;
 using Accord.Statistics;
 using Accord.MachineLearning.VectorMachines.Learning;
 using System.Data;
 using System.Collections;
+using System.Data.OleDb;
+using System.Windows.Forms;
+using System.IO;
 
 public class SVMTest
 {
@@ -20,37 +24,58 @@ public class SVMTest
 
     public SVMTest(string fileLocation)
     {
-        // Read the Excel worksheet into a DataTable
-        DataTable table = new Accord.IO.ExcelReader(fileLocation).GetWorksheet("Sheet1");
-        ArrayList columns = new ArrayList();
-        for (int i = 1; i <= 30; i++)
-        {
-            columns.Add("HC_X_" + i);
-            columns.Add("HC_Y_" + i);
-            columns.Add("HC_Z_" + i);
-            columns.Add("S_X_" + i);
-            columns.Add("S_Y_" + i);
-            columns.Add("S_Z_" + i);
-            columns.Add("H_X_" + i);
-            columns.Add("H_Y_" + i);
-            columns.Add("H_Z_" + i);
-            columns.Add("KL_X_" + i);
-            columns.Add("KL_Y_" + i );
-            columns.Add("KL_Z_" + i);
-            columns.Add("KR_X_" + i);
-            columns.Add("KR_Y_" + i);
-            columns.Add("KR_Z_" + i);
-            columns.Add("BBW_" + i);
-            columns.Add("BBH_" + i);
-            columns.Add("BBD_" + i);
-            columns.Add("TS_" + i);
-        }
-        columns.Add("Class");
-        // Convert the DataTable to input and output vectors
-        this.inputs = table.ToJagged<double>(columns.ToArray(typeof(string)) as string[]);
-        this.outputs = table.Columns["Class"].ToArray<int>();
+        // Read the Excel worksheet into a DataTable    
+        //DataTable table = new ExcelReader(fileLocation).GetWorksheet("Sheet1");
 
-        //ScatterplotBox.Show("Yin-Yang", inputs, outputs).Hold();
+        StreamReader oStreamReader = new StreamReader(fileLocation);
+        DataTable table = new DataTable();
+        int rowCount = 0;
+        string[] columnNames = null;
+        string[] featureVector = null;
+        while (!oStreamReader.EndOfStream)
+        {
+            String row = oStreamReader.ReadLine().Trim();
+
+            if(row.Length > 0)
+            {
+                featureVector = row.Split(',');
+                if (rowCount == 0)
+                {
+                    columnNames = featureVector;
+                    foreach (string columnHeader in columnNames){
+                        DataColumn column = new DataColumn(columnHeader.ToUpper(), typeof(string));
+                        column.DefaultValue = (float) 0;
+                        table.Columns.Add(column);
+                    }
+                }else
+                {
+                    DataRow tableRow = table.NewRow();
+                    for(int i =0; i<columnNames.Length; i++)
+                    {
+                        if(featureVector[i] == null)
+                        {
+                            tableRow[columnNames[i]] = 0;
+                        }
+                        else
+                        {
+                            tableRow[columnNames[i]] = featureVector[i];
+                        }
+                    }
+                    table.Rows.Add(tableRow);
+
+                }
+            }
+            rowCount++;
+        }
+        oStreamReader.Close();
+        oStreamReader.Dispose();
+
+        string[] features = new string[570];
+        Array.Copy(columnNames, 0, features,0, 570);
+
+        this.inputs = table.ToJagged<double>(features);
+        this.outputs = table.Columns["Class"].ToArray<int>();
+        //ScatterplotBox.Show("Fall non fall", inputs, outputs).Hold();
     }
 
     public Accord.MachineLearning.VectorMachines.SupportVectorMachine buildModel()
@@ -69,8 +94,8 @@ public class SVMTest
             bool[] answers = svmModel.Decide(inputs);
             zeroOneAnswers = answers.ToZeroOne();
 
-            ScatterplotBox.Show("Expected results", inputs, outputs);
-            ScatterplotBox.Show("LinearSVM results", inputs, zeroOneAnswers);
+            //ScatterplotBox.Show("Expected results", inputs, outputs);
+            //ScatterplotBox.Show("LinearSVM results", inputs, zeroOneAnswers);
         }
         
         return zeroOneAnswers[0];

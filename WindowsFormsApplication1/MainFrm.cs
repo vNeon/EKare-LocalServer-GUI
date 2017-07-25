@@ -148,6 +148,8 @@ namespace WindowsFormsApplication1
             else
             {
                 kinect.Stop();
+                kinect.ColorStream.Disable();
+                kinect.DepthStream.Disable();
                 kinect.DepthFrameReady -= Kinect_DepthFrameReady;
                 kinect.ColorFrameReady -= Kinect_ColorFrameReady;
                 tbOutput.AppendText("Stopped Kinect!\n");
@@ -159,11 +161,20 @@ namespace WindowsFormsApplication1
         //Turn on the skeleton tracking 
         private void skeletonCB_CheckedChanged(object sender, EventArgs e)
         {
+            
             if (kinect.IsRunning)
             {
-                kinect.SkeletonStream.Enable();
-                //kinect.SkeletonStream.TrackingMode = SkeletonTrackingMode.Seated;
-                kinect.SkeletonFrameReady += Kinect_SkeletonFrameReady;
+                if (skeletonCB.Checked)
+                {
+                    kinect.SkeletonStream.Enable();
+                    //kinect.SkeletonStream.TrackingMode = SkeletonTrackingMode.Seated;
+                    kinect.SkeletonFrameReady += Kinect_SkeletonFrameReady;
+                }else
+                {
+                    kinect.SkeletonStream.Disable();
+                    //kinect.SkeletonStream.TrackingMode = SkeletonTrackingMode.Seated;
+                    kinect.SkeletonFrameReady -= Kinect_SkeletonFrameReady;
+                }
             }
         }   
 
@@ -263,7 +274,7 @@ namespace WindowsFormsApplication1
                                 
                                 if(frameCounter == 150)
                                 {
-                                    Console.WriteLine(fiveSecondData.Count);
+                                    //Console.WriteLine(fiveSecondData.Count);
                                     // MACHINE LEARNING TO DETECT FALL HERE
                                     // SHOULD CALL ANOTHER FUNCTION
                                     // MAYBE ON A DIFFERENT THREAD 
@@ -272,10 +283,10 @@ namespace WindowsFormsApplication1
                                     int res = svm.classify(input);
                                     if(res == 1)
                                     {
-                                        tbOutput.AppendText("Fall detected");
+                                        tbOutput.AppendText("Fall detected\n");
                                     }else
                                     {
-                                        tbOutput.AppendText("Not Fall");
+                                        tbOutput.AppendText("Not Fall\n");
                                     }
                                 }
                                 
@@ -478,8 +489,9 @@ namespace WindowsFormsApplication1
 
         private void SVMBtn_Click(object sender, EventArgs e)
         {
-            svm = new SVMTest(@"C:\Users\johnn\Desktop\trainingdata.xlsx");
+            svm = new SVMTest(@"C:\Users\johnn\Desktop\trainingdata2.csv");
             svm.buildModel();
+            tbOutput.AppendText("SVM model ready");
         }
 
         private void button2_Click(object sender, EventArgs e)
