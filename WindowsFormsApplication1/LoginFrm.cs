@@ -66,7 +66,8 @@ namespace WindowsFormsApplication1
          */ 
         private Dictionary<string,User> getUserList()
         {
-            FirebaseRequest emailRequest = new FirebaseRequest(GlobalValues.FBRTDBURI + "/" + Table.users.ToString() + ".json" + "?auth=" + GlobalValues.dbSecret, httpMethod.GET);
+            FirebaseRequest emailRequest = new FirebaseRequest(GlobalValues.FBRTDBURI + "/" + Table.users.ToString()
+                                                                + ".json" + "?auth=" + GlobalValues.dbSecret, httpMethod.GET);
             emailRequest.makeRequest();
             String res = emailRequest.executeGetRequest();
             Dictionary<string, User> jsonTemp = JsonConvert.DeserializeObject<Dictionary<string, User>>(res);
@@ -76,7 +77,8 @@ namespace WindowsFormsApplication1
 
         private void getUserContacts()
         {
-            FirebaseRequest contactsRequest = new FirebaseRequest(GlobalValues.FBRTDBURI + "/" + Table.users.ToString() + "/"+GlobalValues.userID+"/contacts.json" + "?auth=" + GlobalValues.dbSecret, httpMethod.GET);
+            FirebaseRequest contactsRequest = new FirebaseRequest(GlobalValues.FBRTDBURI + "/" + Table.users.ToString() 
+                                                    + "/"+GlobalValues.userID+"/contacts.json" + "?auth=" + GlobalValues.dbSecret, httpMethod.GET);
             contactsRequest.makeRequest();
             String res = contactsRequest.executeGetRequest();
             Console.WriteLine(res);

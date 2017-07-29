@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Firebase.Storage;
+using Newtonsoft.Json;
+
 namespace WindowsFormsApplication1
 {
     /// <summary>
@@ -12,6 +14,8 @@ namespace WindowsFormsApplication1
     /// </summary>
     class MessageSender
     {
+
+
         public async void sendMessageToAllContact(String message)
         {
             // Get any Stream -it can be FileStream, MemoryStream or any other type of Stream
@@ -28,12 +32,12 @@ namespace WindowsFormsApplication1
                 .PutAsync(stream);
 
             // REMOVE LATER
-            // Track progress of the upload
-            task.Progress.ProgressChanged += (s, e) => Console.WriteLine($"Progress: {e.Percentage} %");
+            //// Track progress of the upload
+            //task.Progress.ProgressChanged += (s, e) => Console.WriteLine($"Progress: {e.Percentage} %");
 
-            // await the task to wait until upload completes and get the download url
+            // Await the task to wait until upload completes and get the download url
             var downloadUrl = await task;
-            Message mes = new Message(message, GlobalValues.user.email, downloadUrl);
+            Message messageToContacts = new Message(message, GlobalValues.user.name, downloadUrl);
 
             string lastMessage = message;
             int maxMessageLen = 20; // the screen can display messages that are shorter than 20 characters
@@ -42,15 +46,24 @@ namespace WindowsFormsApplication1
                 lastMessage = lastMessage.Trim().Substring(0, lastMessage.Substring(0, 20).LastIndexOf(" "));
             }
 
-            // construct the update message in Json format
-            string updateInfo = "{\"lastMessage\":\""+lastMessage+"\",\"date\":\""+mes.date+"\"}";
+            // Construct the update message in Json format
+            string updateInfo = "{\"lastMessage\":\""+lastMessage+"\",\"date\":\""+ messageToContacts.date+"\"}";
+            getContactList();
             foreach (String key in GlobalValues.contacts.Keys)
             {
-                //TODO HAVE TO CHANGE MESSAGE-LOG TO MESSAGE_LOG
+                messageToContacts.imageURL = downloadUrl;
+                // URL of the message log and the Firebase request 
                 String URI = GlobalValues.FBRTDBURI + "/"+Table.message_log.ToString()+"/" + key + "/messages.json?auth=" + GlobalValues.dbSecret;
                 FirebaseRequest postMessage = new FirebaseRequest(URI, httpMethod.POST);
-                postMessage.executePostRequest(mes);
 
+                // Initialize message object depend of the contact's permissions.
+                if (!GlobalValues.contacts[key].imagePermission)
+                {
+                    messageToContacts.imageURL = String.Empty;
+                }
+
+                postMessage.executePostRequest(messageToContacts);
+                
                 //Update the latest message and timestamp
                 String URImessageLog = GlobalValues.FBRTDBURI + "/" + Table.users.ToString() + "/" +GlobalValues.userID+
                                        "/"+Table.contacts.ToString()+"/"+ key+".json?auth=" + GlobalValues.dbSecret;
@@ -60,6 +73,22 @@ namespace WindowsFormsApplication1
 
             }
 
+        }
+
+
+
+        public void getContactList()
+        {
+            FirebaseRequest contactsRequest = new FirebaseRequest(GlobalValues.FBRTDBURI + "/" + Table.users.ToString()
+                                                                    + "/" + GlobalValues.userID + "/contacts.json" + "?auth=" + GlobalValues.dbSecret, httpMethod.GET);
+            contactsRequest.makeRequest();
+            String res = contactsRequest.executeGetRequest();
+            //Console.WriteLine(res);
+            if (res != null && res != "")
+            {
+                Dictionary<String, Contact> jsonTemp = JsonConvert.DeserializeObject<Dictionary<String, Contact>>(res);
+                GlobalValues.contacts = jsonTemp;
+            }
         }
 
     }

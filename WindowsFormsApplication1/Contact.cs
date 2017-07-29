@@ -16,13 +16,19 @@ namespace WindowsFormsApplication1
         public bool messagePermission { get; set; }
         [JsonProperty("name")]
         public string name { get; set; }
+        [JsonProperty("date")]
+        public string date { get; set; }
+        [JsonProperty("lastMessage")]
+        public string lastMessage { get; set; }
 
-        public Contact(string email, bool imagePermission, bool messagePermission, string name)
+        public Contact(string email, bool imagePermission, bool messagePermission, string name, string date, string lastMessage)
         {
             this.email = email;
             this.imagePermission = imagePermission;
             this.messagePermission = messagePermission;
             this.name = name;
+            this.date = date;
+            this.lastMessage = lastMessage;
         }
     }
 }
