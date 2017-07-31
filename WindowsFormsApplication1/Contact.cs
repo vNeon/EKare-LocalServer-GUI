@@ -20,8 +20,10 @@ namespace WindowsFormsApplication1
         public string date { get; set; }
         [JsonProperty("lastMessage")]
         public string lastMessage { get; set; }
+        [JsonProperty("deviceToken")]
+        public string deviceToken { get; set; }
 
-        public Contact(string email, bool imagePermission, bool messagePermission, string name, string date, string lastMessage)
+        public Contact(string email, bool imagePermission, bool messagePermission, string name, string date, string lastMessage, string deviceToken)
         {
             this.email = email;
             this.imagePermission = imagePermission;
@@ -29,6 +31,8 @@ namespace WindowsFormsApplication1
             this.name = name;
             this.date = date;
             this.lastMessage = lastMessage;
+            this.deviceToken = deviceToken;
         }
+
     }
 }
