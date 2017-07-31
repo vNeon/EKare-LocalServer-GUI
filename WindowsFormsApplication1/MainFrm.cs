@@ -49,7 +49,9 @@ namespace WindowsFormsApplication1
 
         private void button1_Click(object sender, EventArgs e)
         {
-            notifier.SendNotification();
+            // test method
+            tbOutput.AppendText(notifier.SendNotification("Send to targeted users"));
+            
         }
 
         private void sendMessageBtn_Click(object sender, EventArgs e)
