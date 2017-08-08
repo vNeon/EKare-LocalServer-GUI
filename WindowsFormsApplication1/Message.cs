@@ -22,7 +22,7 @@ namespace WindowsFormsApplication1
         public Message(string message, string sender, string imageURL)
         {
             this.message = message;
-            this.time = DateTime.Now.ToString("hh:mm:ss tt");
+            this.time = DateTime.Now.ToString("hh:mm tt");
             this.date = DateTime.Now.ToString("MMM dd");
             this.sender = sender;
             this.imageURL = imageURL;

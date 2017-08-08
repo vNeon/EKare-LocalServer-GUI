@@ -9,11 +9,12 @@ using System.Collections;
 using System.Data.OleDb;
 using System.Windows.Forms;
 using System.IO;
+using Accord.Statistics.Kernels;
 
 public class SVMTest
 {
     public string fileLocation;
-    public Accord.MachineLearning.VectorMachines.SupportVectorMachine svmModel;
+    public Accord.MachineLearning.VectorMachines.SupportVectorMachine<Gaussian> svmModel;
     public double[][] inputs;
     public int[] outputs;
 
@@ -78,9 +79,15 @@ public class SVMTest
         //ScatterplotBox.Show("Fall non fall", inputs, outputs).Hold();
     }
 
-    public Accord.MachineLearning.VectorMachines.SupportVectorMachine buildModel()
+    public Accord.MachineLearning.VectorMachines.SupportVectorMachine<Gaussian> buildModel()
     {
-        var teacher = new LinearCoordinateDescent();
+        // Create a new Sequential Minimal Optimization (SMO) learning 
+        // algorithm and estimate the complexity parameter C from data
+        var teacher = new SequentialMinimalOptimization<Gaussian>()
+        {
+            UseComplexityHeuristic = true,
+            UseKernelEstimation = true // estimate the kernel from the data
+        };
 
         this.svmModel = teacher.Learn(inputs, outputs);
         return svmModel;

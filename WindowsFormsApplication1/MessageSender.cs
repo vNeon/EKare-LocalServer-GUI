@@ -23,12 +23,12 @@ namespace WindowsFormsApplication1
 
             string clockID = DateTime.Now.ToString();
             long hashValue = clockID.GetHashCode();
-            string fileName = GlobalValues.userID + hashValue.ToString();
+            string fileName = GlobalValues.userID + hashValue.ToString()+".png";
 
             // Create a png file in 'image' folder of the firebase bucket
             var task = new FirebaseStorage(GlobalValues.firebaseStorageBucket)
                 .Child("image")
-                .Child(fileName + ".png")
+                .Child(fileName)
                 .PutAsync(stream);
 
             // REMOVE LATER
@@ -36,8 +36,8 @@ namespace WindowsFormsApplication1
             //task.Progress.ProgressChanged += (s, e) => Console.WriteLine($"Progress: {e.Percentage} %");
 
             // Await the task to wait until upload completes and get the download url
-            var downloadUrl = await task;
-            Message messageToContacts = new Message(message, GlobalValues.user.name, downloadUrl);
+            //var downloadUrl = await task;
+            Message messageToContacts = new Message(message, GlobalValues.user.name, fileName);
 
             string lastMessage = message;
             int maxMessageLen = 20; // the screen can display messages that are shorter than 20 characters
@@ -51,7 +51,7 @@ namespace WindowsFormsApplication1
             getContactList();
             foreach (String key in GlobalValues.contacts.Keys)
             {
-                messageToContacts.imageURL = downloadUrl;
+                messageToContacts.imageURL = fileName;
                 // URL of the message log and the Firebase request 
                 String URI = GlobalValues.FBRTDBURI + "/"+Table.message_log.ToString()+"/" + key + "/messages.json?auth=" + GlobalValues.dbSecret;
                 FirebaseRequest postMessage = new FirebaseRequest(URI, httpMethod.POST);
