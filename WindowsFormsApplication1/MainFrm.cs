@@ -35,12 +35,20 @@ namespace WindowsFormsApplication1
         long initializedTimestamp = 0;
         // Count down end time
         DateTime endCounter;
+        DateTime endRecording;
+        bool isRecording;
 
         // Construct the string and append to csv file
         StringBuilder builderForCsv = new StringBuilder();
         StringBuilder builderForSingleScenario = new StringBuilder();
         private double[][] trainingDataset = new double[10][];
-       
+
+        SkeletonFrame prevFrame = null;
+        double prevH = 0;
+        double prevBoxW = 0;
+        double prevBoxH = 0;
+        double prevBoxD = 0;
+
         public MainFrm(String user)
         {
             username = user;
@@ -65,7 +73,7 @@ namespace WindowsFormsApplication1
 
         {
             string uri = "https://myfirstapplication-5ad99.firebaseio.com/users/6b4rvGyIgMgQMo1XQBVKglI5k7l1.json/?auth=rngcgjOb25J68o1JW5XUEFigUbO86kNQmKxN4IB5";
-            FirebaseRequest fq = new FirebaseRequest( uri, httpMethod.GET);
+            FirebaseRequest fq = new FirebaseRequest(uri, httpMethod.GET);
             fq.makeRequest();
             String res = fq.executeGetRequest();
             tbOutput.AppendText(res);
@@ -90,30 +98,13 @@ namespace WindowsFormsApplication1
 
                 // assert the column names for the csv file
                 StringBuilder columns = new StringBuilder();
-                for(int i =1; i<=30; i++)
-                {
-                    string names = "";
-                    names += "HC_X_" + i + ",";
-                    names += "HC_Y_" + i + ",";
-                    names += "HC_Z_" + i + ",";
-                    names += "S_X_" + i + ",";
-                    names += "S_Y_" + i + ",";
-                    names += "S_Z_" + i + ",";
-                    names += "H_X_" + i + ",";
-                    names += "H_Y_" + i + ",";
-                    names += "H_Z_" + i + ",";
-                    names += "KL_X_" + i + ",";
-                    names += "KL_Y_" + i + ",";
-                    names += "KL_Z_" + i + ",";
-                    names += "KR_X_" + i + ",";
-                    names += "KR_Y_" + i + ",";
-                    names += "KR_Z_" + i + ",";
-                    names += "BBW_" + i + ",";
-                    names += "BBH_" + i + ",";
-                    names += "BBD_" + i + ",";
-                    names += "TS_" + i+",";
-                    columns.Append(names);
-                }
+                string names = "";
+                names += "H_Y,";
+                names += "H_Vel_Y,";
+                names += "DELTA_BOX_W,";
+                names += "DELTA_BOX_H,";
+                names += "DELTA_BOX_D,";
+                columns.Append(names);
                 columns.Append("Class");
                 builderForCsv.AppendLine(columns.ToString());
             }
@@ -190,124 +181,144 @@ namespace WindowsFormsApplication1
                 //kinect.SkeletonStream.TrackingMode = SkeletonTrackingMode.Seated;
                 kinect.SkeletonFrameReady += Kinect_SkeletonFrameReady;
             }
-        }   
+        }
 
         // Get the skeletal coordinates
         private void Kinect_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
             using (SkeletonFrame f = e.OpenSkeletonFrame())
             {
-                if (f == null)
-                {
-                    nullframe++;
-                    return;
-                }
-                else
+                if (f != null)
                 {
                     var skeletons = new Skeleton[f.SkeletonArrayLength];
                     f.CopySkeletonDataTo(skeletons);
-                    //counterLbl.Text = DateTime.UtcNow.ToString("ss");
                     // Find the first person to track
                     var trackedPerson = skeletons.FirstOrDefault(s => s.TrackingState == SkeletonTrackingState.Tracked);
 
                     if (trackedPerson != null)
                     {
-                        if(frameCounter > 150)
+                        if (isRecording && (endRecording < DateTime.UtcNow)/*To do recording finished*/)
                         {
                             radioButton4.Checked = true;
                             kinect.SkeletonFrameReady -= Kinect_SkeletonFrameReady;
                             kinect.SkeletonStream.Disable();
                             counterLbl.Text = "Finished Recording!";
+                            isRecording = false;
                             return;
-                        }else if(frameCounter == 0)
-                        {
-                            initializedTimestamp = f.Timestamp;
                         }
-                        frameCounter++;
-                        if (frameCounter % 5 == 0)
+                        List<double> data = new List<double>();
+                        float maxY = -1000;
+                        float minY = -1000;
+                        float maxX = -1000;
+                        float minX = -1000;
+                        float maxZ = -1000;
+                        float minZ = -1000;
+
+                        float headY = 0;
+                        float boxW = 0;
+                        float boxH = 0;
+                        float boxD = 0;
+                        foreach (Joint joint in trackedPerson.Joints)
                         {
-                            ArrayList data = new ArrayList();
-                            float maxY =-1000;
-                            float minY = -1000;
-                            float maxX =-1000;
-                            float minX = -1000;
-                            float maxZ =-1000;
-                            float minZ = -1000;
-                            foreach (Joint joint in trackedPerson.Joints)
+                            //Console.WriteLine(joint.JointType);
+                            if (joint.JointType == JointType.Head)
                             {
-                                //Console.WriteLine(joint.JointType);
-                                if (joint.JointType == JointType.HipCenter || joint.JointType == JointType.Spine || 
-                                   joint.JointType == JointType.Head ||joint.JointType == JointType.KneeLeft ||
-                                   joint.JointType == JointType.KneeRight)
+                                headY = joint.Position.Y;
+                                //data.Add(joint.Position.Y);
+                            }
+                            // Find the max and min coordiates in the X axis
+                            if (maxY == -1000)
+                            {
+                                maxY = joint.Position.Y;
+                                minY = maxY;
+                                maxX = joint.Position.X;
+                                minX = maxX;
+                                maxZ = joint.Position.Z;
+                                minZ = maxZ;
+
+                            }
+                            else
+                            {
+                                if (maxX < joint.Position.X)
                                 {
-                                    data.Add (joint.Position.X);
-                                    data.Add( joint.Position.Y);
-                                    data.Add(joint.Position.Z);
+                                    maxX = joint.Position.X;
                                 }
-                                // Find the max and min coordiates in the X axis
-                                if (maxY == -1000)
+                                if (minX > joint.Position.X)
+                                {
+                                    minX = joint.Position.X;
+                                }
+                                // Find the max and min cooridates in the Y axis
+                                if (maxY < joint.Position.Y)
                                 {
                                     maxY = joint.Position.Y;
-                                    minY = maxY;
-                                    maxX = joint.Position.X;
-                                    minX = maxX;
-                                    maxZ = joint.Position.Z;
-                                    minZ = maxZ;
-
                                 }
-                                else
+                                if (minY > joint.Position.Y)
                                 {
-                                    if (maxX < joint.Position.X)
-                                    {
-                                        maxX = joint.Position.X;
-                                    }
-                                    if (minX > joint.Position.X)
-                                    {
-                                        minX = joint.Position.X;
-                                    }
-                                    // Find the max and min cooridates in the Y axis
-                                    if (maxY < joint.Position.Y)
-                                    {
-                                        maxY = joint.Position.Y;
-                                    }
-                                    if (minY > joint.Position.Y)
-                                    {
-                                        minY = joint.Position.Y;
-                                    }
-                                    // Find the max and min cooridates in the Z axis
-                                    if (maxZ < joint.Position.Z)
-                                    {
-                                        maxZ = joint.Position.Z;
-                                    }
-                                    if (minZ > joint.Position.Z)
-                                    {
-                                        minZ = joint.Position.Z;
-                                    }
+                                    minY = joint.Position.Y;
+                                }
+                                // Find the max and min cooridates in the Z axis
+                                if (maxZ < joint.Position.Z)
+                                {
+                                    maxZ = joint.Position.Z;
+                                }
+                                if (minZ > joint.Position.Z)
+                                {
+                                    minZ = joint.Position.Z;
                                 }
                             }
-                            data.Add(Math.Abs(maxX - minX)); // The width of the bounding box 
-                            data.Add(Math.Abs(maxY - minY)); // The height of the bounding box
-                            data.Add(Math.Abs(maxZ - minZ)); // The depth of the bounding box
-                            data.Add(Convert.ToSingle(f.Timestamp -initializedTimestamp));
+
+
+                            boxW = Math.Abs(maxX - minX); // The width of the bounding box 
+                            boxH = Math.Abs(maxY - minY); // The height of the bounding box
+                            boxD = Math.Abs(maxZ - minZ); // The depth of the bounding box
+
+                        }
+
+                        if (prevFrame == null || (f.Timestamp - prevFrame.Timestamp) > 1000)
+                        {
+                            prevFrame = f;
+                            prevH = headY;
+                            prevBoxW = boxW;
+                            prevBoxH = boxH;
+                            prevBoxD = boxD;
+                        }
+                        else
+                        {
+                            //Add to data
+                            data.Add(headY);
+                            data.Add((headY - prevH) / (f.Timestamp - prevFrame.Timestamp));
+                            data.Add(boxW);
+                            data.Add(boxH);
+                            data.Add(boxD);
+
                             // Console.WriteLine("Frame no " + frameCounter + " :" + String.Join(",", (string[])data.ToArray(Type.GetType("System.String"))));
                             String s = String.Empty;
                             foreach (float fl in data)
                             {
                                 s += fl.ToString() + ",";
                             }
-                            builderForSingleScenario.Append(s);
-                            if(frameCounter == 150)
+                            if (isRecording)
                             {
-                                builderForSingleScenario.AppendLine(fallornahCb.Checked ? "1":"0");
-                                prevLen=builderForSingleScenario.Length;
-                                builderForCsv.AppendLine(builderForSingleScenario.ToString());
+                                builderForCsv.AppendLine(s);
                             }
-                            Console.WriteLine("Frame "+frameCounter+" :"+s);
-
+                            else
+                            {
+                                if (svm == null)
+                                {
+                                    svm = new SVMTest(@"C: \Users\n\Desktop\Book1.xlsx");
+                                    svm.buildModel();
+                                }
+                                //run algorithm
+                                double[][] input = new double[1][];
+                                input[0] = data.ToArray() as double[];
+                                bool isFall = svm.classify(input);
+                                if (isFall)
+                                {
+                                    tbOutput.AppendText("Fall Detected! \n");
+                                }
+                            }
+                            Console.WriteLine(s);
                         }
-                        frameCounter += nullframe;
-                        nullframe = 0;
-
                     }
                 }
             }
@@ -328,7 +339,7 @@ namespace WindowsFormsApplication1
 
         private void Kinect_ColorFrameReady(object sender, ColorImageFrameReadyEventArgs e)
         {
-            using ( ColorImageFrame f = e.OpenColorImageFrame())
+            using (ColorImageFrame f = e.OpenColorImageFrame())
             {
                 if (f != null)
                 {
@@ -393,18 +404,18 @@ namespace WindowsFormsApplication1
             //    Console.WriteLine(depthData[i]);
             //}
 
-           // Console.WriteLine(pdata.ToInt32().ToString());
+            // Console.WriteLine(pdata.ToInt32().ToString());
 
             //We want to build a bitmap, hence need an array of bytes
             // The size of the byte array is the width * height *4, 4 since we are doing rgba
             Byte[] colorPixels = new byte[f.Height * f.Width * 4];
             int stride = f.Width * 4;
 
-            const int blueIndex= 0;
+            const int blueIndex = 0;
             const int greenIndex = 1;
             const int redIndex = 2;
 
-            for(int depthIndex =0, colorIndex =0; depthIndex < depthData.Length && colorIndex < colorPixels.Length; depthIndex ++, colorIndex += 4)
+            for (int depthIndex = 0, colorIndex = 0; depthIndex < depthData.Length && colorIndex < colorPixels.Length; depthIndex++, colorIndex += 4)
             {
                 int player = colorPixels[depthIndex] & DepthImageFrame.PlayerIndexBitmask;
 
@@ -448,7 +459,7 @@ namespace WindowsFormsApplication1
                 bitmap = new System.Drawing.Bitmap(outStream);
             }
             return bitmap;
- 
+
 
         }
 
@@ -458,14 +469,14 @@ namespace WindowsFormsApplication1
             this.lblStatus.Text = kinect.Status.ToString();
         }
 
-     
+
         private void DisplayRGB()
         {
             kinect.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
             kinect.ColorFrameReady += Kinect_ColorFrameReady;
         }
 
-        public static byte CalculateIntensityFromDepth(int distance )
+        public static byte CalculateIntensityFromDepth(int distance)
         {
 
             return (byte)(255 - (255 * Math.Max(distance - MinDepthDistance, 0) / (MaxDepthDistanceOffset)));
@@ -475,15 +486,15 @@ namespace WindowsFormsApplication1
         {
 
         }
-        
+
         private void DisplaySkeletal()
         {
         }
-        
+
 
         private void storeDataTest()
         {
-            
+
         }
 
         private void SVMBtn_Click(object sender, EventArgs e)
@@ -507,15 +518,17 @@ namespace WindowsFormsApplication1
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void recorBtn_Click(object sender, EventArgs e)
-        {   
+        {
             frameCounter = 0;
             builderForSingleScenario = new StringBuilder();
             DateTime startTime = DateTime.UtcNow;
             var seconds = 5; //countdown time
             var start = DateTime.UtcNow; // Use UtcNow instead of Now
             endCounter = start.AddSeconds(seconds); //endTime is a member, not a local variable
+            isRecording = true;
+            endRecording = endCounter.AddSeconds(15);
             timer1.Enabled = true;
-           
+
         }
 
 
@@ -524,7 +537,7 @@ namespace WindowsFormsApplication1
             TimeSpan remainingTime = endCounter - DateTime.UtcNow;
             if (remainingTime < TimeSpan.Zero)
             {
-                counterLbl.Text="Started Recording!";
+                counterLbl.Text = "Started Recording!";
                 //skeletonCB.Checked = true;
                 radioButton1.Checked = true;
                 enableSkeleton();
@@ -561,7 +574,7 @@ namespace WindowsFormsApplication1
 
         private void removeBtn_Click(object sender, EventArgs e)
         {
-            builderForCsv.Remove(builderForCsv.Length-1 - prevLen-1, prevLen);
+            builderForCsv.Remove(builderForCsv.Length - 1 - prevLen - 1, prevLen);
             Console.WriteLine(builderForCsv.ToString());
         }
     }
