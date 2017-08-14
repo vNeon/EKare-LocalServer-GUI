@@ -4,6 +4,7 @@ using Accord.Math;
 using Accord.Statistics;
 using Accord.MachineLearning.VectorMachines.Learning;
 using System.Data;
+using Microsoft.Kinect;
 
 public class SVMTest
 {
@@ -44,6 +45,13 @@ public class SVMTest
         }
         
         return answers[0];
+    }
+
+    public bool classify(SkeletonFrame prevFrame, SkeletonFrame newFrame)
+    {
+
+
+        return false;
     }
 
     public void test()
@@ -88,6 +96,4 @@ public class SVMTest
         // Plot the support vectors selected by the machine
         ScatterplotBox.Show("Support vectors", sv).Hold();
     }
-
-
 }

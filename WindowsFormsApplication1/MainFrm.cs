@@ -40,6 +40,7 @@ namespace WindowsFormsApplication1
 
         // Construct the string and append to csv file
         StringBuilder builderForCsv = new StringBuilder();
+        StringBuilder rawDataBuilder = new StringBuilder();
         StringBuilder builderForSingleScenario = new StringBuilder();
         private double[][] trainingDataset = new double[10][];
 
@@ -93,6 +94,7 @@ namespace WindowsFormsApplication1
                 lblConnectionID.Text = kinect.DeviceConnectionId;
                 tbOutput.AppendText("Found kinectID: " + kinect.DeviceConnectionId + "\n");
                 //kinect.DepthStream.Enable();
+
                 kinect.SkeletonStream.Enable();
                 //kinect.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
 
@@ -107,6 +109,45 @@ namespace WindowsFormsApplication1
                 columns.Append(names);
                 columns.Append("Class");
                 builderForCsv.AppendLine(columns.ToString());
+
+                columns = new StringBuilder();
+                string features = "";
+                features += "HEAD_X,";
+                features += "HEAD_Y,";
+                features += "HEAD_Z,";
+
+                features += "SHOULDER_CENTER_X,";
+                features += "SHOULDER_CENTER_Y,";
+                features += "SHOULDER_CENTER_Z,";
+
+                features += "HIP_CENTER_X,";
+                features += "HIP_CENTER_Y,";
+                features += "HIP_CENTER_Z,";
+
+                features += "KNEE_LEFT_X,";
+                features += "KNEE_LEFT_Y,";
+                features += "KNEE_LEFT_Z,";
+
+                features += "KNEE_RIGHT_X,";
+                features += "KNEE_RIGHT_Y,";
+                features += "KNEE_RIGHT_Z,";
+
+                features += "FOOT_LEFT_X,";
+                features += "FOOT_LEFT_Y,";
+                features += "FOOT_LEFT_Z,";
+
+                features += "FOOT_RIGHT_X,";
+                features += "FOOT_RIGHT_Y,";
+                features += "FOOT_RIGHT_Z,";
+
+                features += "DELTA_BOX_W,";
+                features += "DELTA_BOX_H,";
+                features += "DELTA_BOX_D,";
+                features += "TIME_STAMP,";
+                features += "Class";
+                columns.Append(features);
+                columns.Append("Class");
+                rawDataBuilder.AppendLine(columns.ToString());
             }
         }
 
@@ -207,6 +248,8 @@ namespace WindowsFormsApplication1
                             return;
                         }
                         List<double> data = new List<double>();
+                        List<double> raw_data = new List<double>();
+
                         float maxY = -1000;
                         float minY = -1000;
                         float maxX = -1000;
@@ -218,14 +261,12 @@ namespace WindowsFormsApplication1
                         float boxW = 0;
                         float boxH = 0;
                         float boxD = 0;
+
+                        headY = trackedPerson.Joints[JointType.Head].Position.Y;
+
                         foreach (Joint joint in trackedPerson.Joints)
                         {
                             //Console.WriteLine(joint.JointType);
-                            if (joint.JointType == JointType.Head)
-                            {
-                                headY = joint.Position.Y;
-                                //data.Add(joint.Position.Y);
-                            }
                             // Find the max and min coordiates in the X axis
                             if (maxY == -1000)
                             {
@@ -235,7 +276,6 @@ namespace WindowsFormsApplication1
                                 minX = maxX;
                                 maxZ = joint.Position.Z;
                                 minZ = maxZ;
-
                             }
                             else
                             {
@@ -293,18 +333,68 @@ namespace WindowsFormsApplication1
 
                             // Console.WriteLine("Frame no " + frameCounter + " :" + String.Join(",", (string[])data.ToArray(Type.GetType("System.String"))));
                             String s = String.Empty;
-                            foreach (float fl in data)
+                            foreach (double fl in data)
                             {
                                 s += fl.ToString() + ",";
                             }
+
                             if (isRecording)
                             {
                                 builderForCsv.AppendLine(s);
+
+                                Joint head = trackedPerson.Joints[JointType.Head];
+                                Joint shoulder_centre = trackedPerson.Joints[JointType.ShoulderCenter];
+                                Joint hip_centre = trackedPerson.Joints[JointType.HipCenter];
+                                Joint knee_left = trackedPerson.Joints[JointType.KneeLeft];
+                                Joint knee_right = trackedPerson.Joints[JointType.KneeRight];
+                                Joint foot_left = trackedPerson.Joints[JointType.FootLeft];
+                                Joint foot_right = trackedPerson.Joints[JointType.FootRight];
+
+                                raw_data.Add(head.Position.X);
+                                raw_data.Add(head.Position.Y);
+                                raw_data.Add(head.Position.Z);
+
+                                raw_data.Add(shoulder_centre.Position.X);
+                                raw_data.Add(shoulder_centre.Position.Y);
+                                raw_data.Add(shoulder_centre.Position.Z);
+
+                                raw_data.Add(hip_centre.Position.X);
+                                raw_data.Add(hip_centre.Position.Y);
+                                raw_data.Add(hip_centre.Position.Z);
+
+                                raw_data.Add(knee_left.Position.X);
+                                raw_data.Add(knee_left.Position.Y);
+                                raw_data.Add(knee_left.Position.Z);
+
+                                raw_data.Add(knee_right.Position.X);
+                                raw_data.Add(knee_right.Position.Y);
+                                raw_data.Add(knee_right.Position.Z);
+
+                                raw_data.Add(foot_left.Position.X);
+                                raw_data.Add(foot_left.Position.Y);
+                                raw_data.Add(foot_left.Position.Z);
+
+                                raw_data.Add(foot_right.Position.X);
+                                raw_data.Add(foot_right.Position.Y);
+                                raw_data.Add(foot_right.Position.Z);
+
+                                raw_data.Add(boxW);
+                                raw_data.Add(boxH);
+                                raw_data.Add(boxD);
+                                raw_data.Add(f.Timestamp);
+
+                                String tmp = String.Empty;
+                                foreach (double fl in raw_data)
+                                {
+                                    tmp += fl.ToString() + ",";
+                                }
+                                rawDataBuilder.AppendLine(tmp);
                             }
                             else
                             {
                                 if (svm == null)
                                 {
+                                    // Change to training data location
                                     svm = new SVMTest(@"C: \Users\n\Desktop\Book1.xlsx");
                                     svm.buildModel();
                                 }
@@ -324,6 +414,15 @@ namespace WindowsFormsApplication1
             }
         }
 
+        private void raw_data()
+        {
+
+        }
+
+        private void test_training_data()
+        {
+
+        }
 
         private void Kinect_DepthFrameReady(object sender, DepthImageFrameReadyEventArgs e)
         {
@@ -570,6 +669,17 @@ namespace WindowsFormsApplication1
             }
             Console.WriteLine(csvPath);
             File.AppendAllText(csvPath, builderForCsv.ToString());
+
+            // For raw data
+            csvPath = Directory.GetCurrentDirectory() + "/rawdata.csv";
+            counter = 1;
+            while (File.Exists(csvPath))
+            {
+                csvPath = Directory.GetCurrentDirectory() + "/rawdata" + counter + ".csv";
+                counter++;
+            }
+            Console.WriteLine(csvPath);
+            File.AppendAllText(csvPath, rawDataBuilder.ToString());
         }
 
         private void removeBtn_Click(object sender, EventArgs e)
