@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System;
 using System.Windows;
 using System.Windows.Forms;
+using Accord.Statistics.Kernels;
 
 public class SVMTest
 {
@@ -60,6 +61,14 @@ public class SVMTest
     public Accord.MachineLearning.VectorMachines.SupportVectorMachine buildModel()
     {
         var teacher = new LinearCoordinateDescent();
+
+        /*
+        var teacher = new SequentialMinimalOptimization<Gaussian>()
+        {
+            UseComplexityHeuristic = true,
+            UseKernelEstimation = true // estimate the kernel from the data
+        };
+        */
 
         this.svmModel = teacher.Learn(inputs, outputs);
         return svmModel;
