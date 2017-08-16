@@ -147,6 +147,7 @@
     <Compile Include="NotificationSender.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RandomForestClassifier.cs" />
     <Compile Include="SVMTest.cs" />
     <Compile Include="User.cs" />
     <EmbeddedResource Include="MainFrm.resx">

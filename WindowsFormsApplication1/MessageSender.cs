@@ -37,7 +37,7 @@ namespace WindowsFormsApplication1
 
             // Await the task to wait until upload completes and get the download url
             //var downloadUrl = await task;
-            Message messageToContacts = new Message(message, GlobalValues.user.name, fileName);
+            Message messageToContacts = new Message(message, GlobalValues.user.email, fileName);
 
             string lastMessage = message;
             int maxMessageLen = 20; // the screen can display messages that are shorter than 20 characters
@@ -47,7 +47,9 @@ namespace WindowsFormsApplication1
             }
 
             // Construct the update message in Json format
-            string updateInfo = "{\"lastMessage\":\""+lastMessage+"\",\"date\":\""+ messageToContacts.date+"\"}";
+            string updateInfo = "{\"lastMessage\":\""+lastMessage+"\",\"date\":\""+ messageToContacts.date+"\",\"numNotifications\":\"";
+            
+            //Get the contact lists again before sending the notification
             getContactList();
             foreach (String key in GlobalValues.contacts.Keys)
             {
@@ -68,9 +70,9 @@ namespace WindowsFormsApplication1
                 String URImessageLog = GlobalValues.FBRTDBURI + "/" + Table.users.ToString() + "/" +GlobalValues.userID+
                                        "/"+Table.contacts.ToString()+"/"+ key+".json?auth=" + GlobalValues.dbSecret;
                 FirebaseRequest postMessageLog = new FirebaseRequest(URImessageLog, httpMethod.POST);
-
-                postMessageLog.updateMesssageLog(updateInfo);
-
+                int numNotifications = GlobalValues.contacts[key].numNotifications + 1;
+                string json=updateInfo + numNotifications.ToString()+"\"}";
+                postMessageLog.updateMesssageLog(json);
             }
 
         }

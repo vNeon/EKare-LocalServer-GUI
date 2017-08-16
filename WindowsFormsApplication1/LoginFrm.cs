@@ -23,7 +23,7 @@ namespace WindowsFormsApplication1
         private void loginBtn_Click(object sender, EventArgs e)
         {
             // TO DO :Obfusticate the password
-            var email = emailTb.Text.Trim();
+            var email = emailTb.Text.Trim().ToLower();
             var password = passwordTb.Text.Trim();
             if (!verfifyAccount(email, password))
             {
@@ -49,7 +49,7 @@ namespace WindowsFormsApplication1
             foreach(String s in users.Keys)
             {
                 User user = users[s];
-                if (user.email.Equals(email))
+                if (user.email.ToLower().Equals(email))
                 {
                     GlobalValues.userID = s;
                     userName = user.name;
