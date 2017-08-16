@@ -124,6 +124,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FirebaseRequest.cs" />
+    <Compile Include="FrameObject.cs" />
     <Compile Include="GlobalValues.cs" />
     <Compile Include="MainFrm.cs">
       <SubType>Form</SubType>

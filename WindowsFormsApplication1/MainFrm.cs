@@ -11,6 +11,8 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Collections;
 using System.Text;
+using System.Threading;
+using Accord.Math;
 
 namespace WindowsFormsApplication1
 {
@@ -49,11 +51,15 @@ namespace WindowsFormsApplication1
         double prevBoxW = 0;
         double prevBoxH = 0;
         double prevBoxD = 0;
+        FrameObject prevFrameObject;
+
+        public static MainFrm _MainFrm;
 
         public MainFrm(String user)
         {
             username = user;
             InitializeComponent();
+            _MainFrm = this;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -101,11 +107,28 @@ namespace WindowsFormsApplication1
                 // assert the column names for the csv file
                 StringBuilder columns = new StringBuilder();
                 string names = "";
+                //names += "H_X,";
                 names += "H_Y,";
+                //names += "H_Z,";
+                //names += "H_Vel_X,";
                 names += "H_Vel_Y,";
+                //names += "H_Vel_Z,";
+                names += "BOX_W,";
+                names += "BOX_H,";
+                names += "BOX_D,";
                 names += "DELTA_BOX_W,";
                 names += "DELTA_BOX_H,";
                 names += "DELTA_BOX_D,";
+                names += "SP_X,";
+                names += "SP_Y,";
+                names += "SP_Z,";
+                //names += "HP_X,";
+                names += "HP_Y,";
+                //names += "HP_Z,";
+                //names += "HP_Vel_X,";
+                names += "HP_Vel_Y,";
+                //names += "HP_Vel_Z,";
+
                 columns.Append(names);
                 columns.Append("Class");
                 builderForCsv.AppendLine(columns.ToString());
@@ -227,6 +250,7 @@ namespace WindowsFormsApplication1
         // Get the skeletal coordinates
         private void Kinect_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
+            
             using (SkeletonFrame f = e.OpenSkeletonFrame())
             {
                 if (f != null)
@@ -238,6 +262,7 @@ namespace WindowsFormsApplication1
 
                     if (trackedPerson != null)
                     {
+                        // do recording stuff
                         if (isRecording && (endRecording < DateTime.UtcNow)/*To do recording finished*/)
                         {
                             radioButton4.Checked = true;
@@ -257,12 +282,28 @@ namespace WindowsFormsApplication1
                         float maxZ = -1000;
                         float minZ = -1000;
 
-                        float headY = 0;
                         float boxW = 0;
                         float boxH = 0;
                         float boxD = 0;
 
-                        headY = trackedPerson.Joints[JointType.Head].Position.Y;
+                        double headX = trackedPerson.Joints[JointType.Head].Position.X;
+                        double headY = trackedPerson.Joints[JointType.Head].Position.Y;
+                        double headZ = trackedPerson.Joints[JointType.Head].Position.Z;
+
+                        float shoulderCenterX = trackedPerson.Joints[JointType.ShoulderCenter].Position.X;
+                        float shoulderCenterY = trackedPerson.Joints[JointType.ShoulderCenter].Position.Y;
+                        float shoulderCenterZ = trackedPerson.Joints[JointType.ShoulderCenter].Position.Z;
+
+                        Vector3 shoulderCenter = new Vector3(shoulderCenterX, shoulderCenterY, shoulderCenterZ);
+
+                        float hipCenterX = trackedPerson.Joints[JointType.HipCenter].Position.X;
+                        float hipCenterY = trackedPerson.Joints[JointType.HipCenter].Position.Y;
+                        float hipCenterZ = trackedPerson.Joints[JointType.HipCenter].Position.Z;
+
+                        Vector3 hipCenter = new Vector3(hipCenterX, hipCenterY, hipCenterZ);
+
+                        Vector3 spine = shoulderCenter - hipCenter;
+                        spine.Normalize();
 
                         foreach (Joint joint in trackedPerson.Joints)
                         {
@@ -306,108 +347,79 @@ namespace WindowsFormsApplication1
                                     minZ = joint.Position.Z;
                                 }
                             }
-
-
-                            boxW = Math.Abs(maxX - minX); // The width of the bounding box 
-                            boxH = Math.Abs(maxY - minY); // The height of the bounding box
-                            boxD = Math.Abs(maxZ - minZ); // The depth of the bounding box
-
                         }
 
-                        if (prevFrame == null || (f.Timestamp - prevFrame.Timestamp) > 1000)
+                        boxW = Math.Abs(maxX - minX); // The width of the bounding box 
+                        boxH = Math.Abs(maxY - minY); // The height of the bounding box
+                        boxD = Math.Abs(maxZ - minZ); // The depth of the bounding box
+
+                        if (prevFrameObject == null || (f.Timestamp - prevFrameObject.Timestamp) > 1000)
                         {
-                            prevFrame = f;
-                            prevH = headY;
-                            prevBoxW = boxW;
-                            prevBoxH = boxH;
-                            prevBoxD = boxD;
+                            prevFrameObject = new FrameObject(f.Timestamp, headX, headY, headZ, boxW, boxH, boxD, spine.X, spine.Y, spine.Z, hipCenterX, hipCenterY, hipCenterZ);
+                            Console.WriteLine((f.Timestamp));
+                            Console.WriteLine((prevFrameObject.Timestamp));
                         }
                         else
                         {
-                            //Add to data
-                            data.Add(headY);
-                            data.Add((headY - prevH) / (f.Timestamp - prevFrame.Timestamp));
-                            data.Add(boxW);
-                            data.Add(boxH);
-                            data.Add(boxD);
-
-                            // Console.WriteLine("Frame no " + frameCounter + " :" + String.Join(",", (string[])data.ToArray(Type.GetType("System.String"))));
-                            String s = String.Empty;
-                            foreach (double fl in data)
-                            {
-                                s += fl.ToString() + ",";
-                            }
+                            FrameObject newFrame = new FrameObject(f.Timestamp, headX, headY, headZ, boxW, boxH, boxD, spine.X, spine.Y, spine.Z, hipCenterX, hipCenterY, hipCenterZ);
 
                             if (isRecording)
                             {
-                                builderForCsv.AppendLine(s);
+                                //Add to data
+                                long timeDifference = newFrame.Timestamp - prevFrameObject.Timestamp;
+                                //data.Add(newFrame.HeadX);
+                                data.Add(newFrame.HeadY);
+                                //data.Add(newFrame.HeadZ);
+                                //data.Add((newFrame.HeadX - prevFrameObject.HeadX) / (timeDifference));
+                                data.Add((newFrame.HeadY - prevFrameObject.HeadY) / (timeDifference));
+                                //data.Add((newFrame.HeadZ - prevFrameObject.HeadZ) / (timeDifference));
+                                data.Add(newFrame.BoxW);
+                                data.Add(newFrame.BoxH);
+                                data.Add(newFrame.BoxD);
+                                data.Add((newFrame.BoxW - prevFrameObject.BoxW) / (timeDifference));
+                                data.Add((newFrame.BoxH - prevFrameObject.BoxH) / (timeDifference));
+                                data.Add((newFrame.BoxD - prevFrameObject.BoxD) / (timeDifference));
+                                data.Add(newFrame.SpineX);
+                                data.Add(newFrame.SpineY);
+                                data.Add(newFrame.SpineZ);
+                                //data.Add(newFrame.HipX);
+                                data.Add(newFrame.HipY);
+                                //data.Add(newFrame.HipZ);
+                                //data.Add((newFrame.HipX - prevFrameObject.HipX) / (timeDifference));
+                                data.Add((newFrame.HipY - prevFrameObject.HipY) / (timeDifference));
+                                //data.Add((newFrame.HipZ - prevFrameObject.HipZ) / (timeDifference));
 
-                                Joint head = trackedPerson.Joints[JointType.Head];
-                                Joint shoulder_centre = trackedPerson.Joints[JointType.ShoulderCenter];
-                                Joint hip_centre = trackedPerson.Joints[JointType.HipCenter];
-                                Joint knee_left = trackedPerson.Joints[JointType.KneeLeft];
-                                Joint knee_right = trackedPerson.Joints[JointType.KneeRight];
-                                Joint foot_left = trackedPerson.Joints[JointType.FootLeft];
-                                Joint foot_right = trackedPerson.Joints[JointType.FootRight];
-
-                                raw_data.Add(head.Position.X);
-                                raw_data.Add(head.Position.Y);
-                                raw_data.Add(head.Position.Z);
-
-                                raw_data.Add(shoulder_centre.Position.X);
-                                raw_data.Add(shoulder_centre.Position.Y);
-                                raw_data.Add(shoulder_centre.Position.Z);
-
-                                raw_data.Add(hip_centre.Position.X);
-                                raw_data.Add(hip_centre.Position.Y);
-                                raw_data.Add(hip_centre.Position.Z);
-
-                                raw_data.Add(knee_left.Position.X);
-                                raw_data.Add(knee_left.Position.Y);
-                                raw_data.Add(knee_left.Position.Z);
-
-                                raw_data.Add(knee_right.Position.X);
-                                raw_data.Add(knee_right.Position.Y);
-                                raw_data.Add(knee_right.Position.Z);
-
-                                raw_data.Add(foot_left.Position.X);
-                                raw_data.Add(foot_left.Position.Y);
-                                raw_data.Add(foot_left.Position.Z);
-
-                                raw_data.Add(foot_right.Position.X);
-                                raw_data.Add(foot_right.Position.Y);
-                                raw_data.Add(foot_right.Position.Z);
-
-                                raw_data.Add(boxW);
-                                raw_data.Add(boxH);
-                                raw_data.Add(boxD);
-                                raw_data.Add(f.Timestamp);
-
-                                String tmp = String.Empty;
-                                foreach (double fl in raw_data)
+                                // Console.WriteLine("Frame no " + frameCounter + " :" + String.Join(",", (string[])data.ToArray(Type.GetType("System.String"))));
+                                String s = String.Empty;
+                                foreach (double fl in data)
                                 {
-                                    tmp += fl.ToString() + ",";
+                                    s += fl.ToString() + ",";
                                 }
-                                rawDataBuilder.AppendLine(tmp);
+                                builderForCsv.AppendLine(s);
+                                Console.WriteLine(s);
                             }
                             else
                             {
+                                // if classify create object, then change the prevFrame
                                 if (svm == null)
                                 {
                                     // Change to training data location
                                     svm = new SVMTest(@"C: \Users\n\Desktop\Book1.xlsx");
                                     svm.buildModel();
                                 }
-                                //run algorithm
-                                double[][] input = new double[1][];
-                                input[0] = data.ToArray() as double[];
-                                bool isFall = svm.classify(input);
-                                if (isFall)
-                                {
-                                    tbOutput.AppendText("Fall Detected! \n");
-                                }
+                                //run algorithm 
+
+                                SVMTest threadModel = new SVMTest((Accord.MachineLearning.VectorMachines.SupportVectorMachine)svm.svmModel.Clone(),
+                                                                    prevFrameObject,
+                                                                    newFrame,
+                                                                    _MainFrm);
+
+                                // add reference to the main for message
+                                Thread threadClassify = new Thread(new ThreadStart(threadModel.classify));
+                                threadClassify.Start();
                             }
-                            Console.WriteLine(s);
+
+                            prevFrameObject = newFrame;
                         }
                     }
                 }
@@ -686,6 +698,21 @@ namespace WindowsFormsApplication1
         {
             builderForCsv.Remove(builderForCsv.Length - 1 - prevLen - 1, prevLen);
             Console.WriteLine(builderForCsv.ToString());
+        }
+
+        private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+
+        }
+
+        public void AppendToBox(String text)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<string>(AppendToBox), new object[] { text });
+                return;
+            }
+            this.tbOutput.AppendText(text);
         }
     }
 }

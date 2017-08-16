@@ -54,6 +54,7 @@
             this.saveBtn = new System.Windows.Forms.Button();
             this.fallornahCb = new System.Windows.Forms.CheckBox();
             this.removeBtn = new System.Windows.Forms.Button();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.videoBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -323,6 +324,10 @@
             this.removeBtn.UseVisualStyleBackColor = true;
             this.removeBtn.Click += new System.EventHandler(this.removeBtn_Click);
             // 
+            // backgroundWorker1
+            // 
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
+            // 
             // MainFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -388,6 +393,7 @@
         private System.Windows.Forms.Button saveBtn;
         private System.Windows.Forms.CheckBox fallornahCb;
         private System.Windows.Forms.Button removeBtn;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }
 
