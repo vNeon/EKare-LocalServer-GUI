@@ -42,15 +42,9 @@ namespace WindowsFormsApplication1
 
         // Construct the string and append to csv file
         StringBuilder builderForCsv = new StringBuilder();
-        StringBuilder rawDataBuilder = new StringBuilder();
         StringBuilder builderForSingleScenario = new StringBuilder();
         private double[][] trainingDataset = new double[10][];
 
-        SkeletonFrame prevFrame = null;
-        double prevH = 0;
-        double prevBoxW = 0;
-        double prevBoxH = 0;
-        double prevBoxD = 0;
         FrameObject prevFrameObject;
 
         public static MainFrm _MainFrm;
@@ -132,45 +126,6 @@ namespace WindowsFormsApplication1
                 columns.Append(names);
                 columns.Append("Class");
                 builderForCsv.AppendLine(columns.ToString());
-
-                columns = new StringBuilder();
-                string features = "";
-                features += "HEAD_X,";
-                features += "HEAD_Y,";
-                features += "HEAD_Z,";
-
-                features += "SHOULDER_CENTER_X,";
-                features += "SHOULDER_CENTER_Y,";
-                features += "SHOULDER_CENTER_Z,";
-
-                features += "HIP_CENTER_X,";
-                features += "HIP_CENTER_Y,";
-                features += "HIP_CENTER_Z,";
-
-                features += "KNEE_LEFT_X,";
-                features += "KNEE_LEFT_Y,";
-                features += "KNEE_LEFT_Z,";
-
-                features += "KNEE_RIGHT_X,";
-                features += "KNEE_RIGHT_Y,";
-                features += "KNEE_RIGHT_Z,";
-
-                features += "FOOT_LEFT_X,";
-                features += "FOOT_LEFT_Y,";
-                features += "FOOT_LEFT_Z,";
-
-                features += "FOOT_RIGHT_X,";
-                features += "FOOT_RIGHT_Y,";
-                features += "FOOT_RIGHT_Z,";
-
-                features += "DELTA_BOX_W,";
-                features += "DELTA_BOX_H,";
-                features += "DELTA_BOX_D,";
-                features += "TIME_STAMP,";
-                features += "Class";
-                columns.Append(features);
-                columns.Append("Class");
-                rawDataBuilder.AppendLine(columns.ToString());
             }
         }
 
@@ -404,7 +359,8 @@ namespace WindowsFormsApplication1
                                 if (svm == null)
                                 {
                                     // Change to training data location
-                                    svm = new SVMTest(@"C: \Users\n\Desktop\Book1.xlsx");
+                                    string trainingDataPath = Directory.GetCurrentDirectory() + "\\Resources\\Book1.xlsx";
+                                    svm = new SVMTest(trainingDataPath);
                                     svm.buildModel();
                                 }
                                 //run algorithm 
@@ -681,17 +637,6 @@ namespace WindowsFormsApplication1
             }
             Console.WriteLine(csvPath);
             File.AppendAllText(csvPath, builderForCsv.ToString());
-
-            // For raw data
-            csvPath = Directory.GetCurrentDirectory() + "/rawdata.csv";
-            counter = 1;
-            while (File.Exists(csvPath))
-            {
-                csvPath = Directory.GetCurrentDirectory() + "/rawdata" + counter + ".csv";
-                counter++;
-            }
-            Console.WriteLine(csvPath);
-            File.AppendAllText(csvPath, rawDataBuilder.ToString());
         }
 
         private void removeBtn_Click(object sender, EventArgs e)
