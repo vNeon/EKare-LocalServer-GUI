@@ -17,6 +17,8 @@ using System.Windows.Media.Imaging;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Collections;
+using Accord.Math;
+using Accord.Statistics.Kernels;
 
 namespace WindowsFormsApplication1
 {
@@ -34,24 +36,27 @@ namespace WindowsFormsApplication1
 
         //SVM Model Object
         public SVMTest svm;
+        FrameObject prevFrameObject;
 
-
-        private int frameCounter=0;
-        private int nullFrameCounter=0;
+        private int frameCounter = 0;
+        private int nullFrameCounter = 0;
 
         private List<double> fiveSecondData = new List<double>();
-       
+
+
+        public static MainFrm _MainFrm;
         public MainFrm(String user)
         {
             username = user;
             InitializeComponent();
+            _MainFrm = this;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             // test method
             tbOutput.AppendText(notifier.SendNotification("Send to targeted users"));
-            
+
         }
 
         private void sendMessageBtn_Click(object sender, EventArgs e)
@@ -67,7 +72,7 @@ namespace WindowsFormsApplication1
 
         {
             string uri = "https://myfirstapplication-5ad99.firebaseio.com/users/6b4rvGyIgMgQMo1XQBVKglI5k7l1.json/?auth=rngcgjOb25J68o1JW5XUEFigUbO86kNQmKxN4IB5";
-            FirebaseRequest fq = new FirebaseRequest( uri, httpMethod.GET);
+            FirebaseRequest fq = new FirebaseRequest(uri, httpMethod.GET);
             fq.makeRequest();
             String res = fq.executeGetRequest();
             tbOutput.AppendText(res);
@@ -163,7 +168,7 @@ namespace WindowsFormsApplication1
         //Turn on the skeleton tracking 
         private void skeletonCB_CheckedChanged(object sender, EventArgs e)
         {
-            
+
             if (kinect.IsRunning)
             {
                 if (skeletonCB.Checked)
@@ -171,20 +176,145 @@ namespace WindowsFormsApplication1
                     kinect.SkeletonStream.Enable();
                     //kinect.SkeletonStream.TrackingMode = SkeletonTrackingMode.Seated;
                     kinect.SkeletonFrameReady += Kinect_SkeletonFrameReady;
-                }else
+                }
+                else
                 {
                     kinect.SkeletonStream.Disable();
                     //kinect.SkeletonStream.TrackingMode = SkeletonTrackingMode.Seated;
                     kinect.SkeletonFrameReady -= Kinect_SkeletonFrameReady;
                 }
             }
-        }   
+        }
 
         // Get the skeletal coordinates
         private void Kinect_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
             using (SkeletonFrame f = e.OpenSkeletonFrame())
             {
+
+                if (f != null)
+                {
+                    var skeletons = new Skeleton[f.SkeletonArrayLength];
+                    f.CopySkeletonDataTo(skeletons);
+                    // Find the first person to track
+                    var trackedPerson = skeletons.FirstOrDefault(s => s.TrackingState == SkeletonTrackingState.Tracked);
+
+                    if (trackedPerson != null)
+                    {
+                        List<double> data = new List<double>();
+
+                        float maxY = -1000;
+                        float minY = -1000;
+                        float maxX = -1000;
+                        float minX = -1000;
+                        float maxZ = -1000;
+                        float minZ = -1000;
+
+                        float boxW = 0;
+                        float boxH = 0;
+                        float boxD = 0;
+
+                        double headX = trackedPerson.Joints[JointType.Head].Position.X;
+                        double headY = trackedPerson.Joints[JointType.Head].Position.Y;
+                        double headZ = trackedPerson.Joints[JointType.Head].Position.Z;
+
+                        float shoulderCenterX = trackedPerson.Joints[JointType.ShoulderCenter].Position.X;
+                        float shoulderCenterY = trackedPerson.Joints[JointType.ShoulderCenter].Position.Y;
+                        float shoulderCenterZ = trackedPerson.Joints[JointType.ShoulderCenter].Position.Z;
+
+                        Vector3 shoulderCenter = new Vector3(shoulderCenterX, shoulderCenterY, shoulderCenterZ);
+
+                        float hipCenterX = trackedPerson.Joints[JointType.HipCenter].Position.X;
+                        float hipCenterY = trackedPerson.Joints[JointType.HipCenter].Position.Y;
+                        float hipCenterZ = trackedPerson.Joints[JointType.HipCenter].Position.Z;
+
+                        Vector3 hipCenter = new Vector3(hipCenterX, hipCenterY, hipCenterZ);
+
+                        Vector3 spine = shoulderCenter - hipCenter;
+                        spine.Normalize();
+
+                        foreach (Joint joint in trackedPerson.Joints)
+                        {
+                            //Console.WriteLine(joint.JointType);
+                            // Find the max and min coordiates in the X axis
+                            if (maxY == -1000)
+                            {
+                                maxY = joint.Position.Y;
+                                minY = maxY;
+                                maxX = joint.Position.X;
+                                minX = maxX;
+                                maxZ = joint.Position.Z;
+                                minZ = maxZ;
+                            }
+                            else
+                            {
+                                if (maxX < joint.Position.X)
+                                {
+                                    maxX = joint.Position.X;
+                                }
+                                if (minX > joint.Position.X)
+                                {
+                                    minX = joint.Position.X;
+                                }
+                                // Find the max and min cooridates in the Y axis
+                                if (maxY < joint.Position.Y)
+                                {
+                                    maxY = joint.Position.Y;
+                                }
+                                if (minY > joint.Position.Y)
+                                {
+                                    minY = joint.Position.Y;
+                                }
+                                // Find the max and min cooridates in the Z axis
+                                if (maxZ < joint.Position.Z)
+                                {
+                                    maxZ = joint.Position.Z;
+                                }
+                                if (minZ > joint.Position.Z)
+                                {
+                                    minZ = joint.Position.Z;
+                                }
+                            }
+                        }
+
+                        boxW = Math.Abs(maxX - minX); // The width of the bounding box 
+                        boxH = Math.Abs(maxY - minY); // The height of the bounding box
+                        boxD = Math.Abs(maxZ - minZ); // The depth of the bounding box
+
+                        if (prevFrameObject == null || (f.Timestamp - prevFrameObject.Timestamp) > 1000)
+                        {
+                            prevFrameObject = new FrameObject(f.Timestamp, headX, headY, headZ, boxW, boxH, boxD, spine.X, spine.Y, spine.Z, hipCenterX, hipCenterY, hipCenterZ);
+                            Console.WriteLine((f.Timestamp));
+                            Console.WriteLine((prevFrameObject.Timestamp));
+                        }
+                        else
+                        {
+                            FrameObject newFrame = new FrameObject(f.Timestamp, headX, headY, headZ, boxW, boxH, boxD, spine.X, spine.Y, spine.Z, hipCenterX, hipCenterY, hipCenterZ);
+                            // if classify create object, then change the prevFrame
+                            if (svm == null)
+                            {
+                                // Change to training data location
+                                svm = new SVMTest();
+                                svm.buildModel();
+                            }
+                            //run algorithm 
+
+                            SVMTest threadModel = new SVMTest((Accord.MachineLearning.VectorMachines.SupportVectorMachine<Gaussian>)svm.svmModel.Clone(),
+                                                                prevFrameObject,
+                                                                newFrame,
+                                                                _MainFrm);
+
+                            // add reference to the main for message
+                            Thread threadClassify = new Thread(new ThreadStart(threadModel.classify));
+                            threadClassify.Start();
+
+                            prevFrameObject = newFrame;
+                        }
+                    }
+                }
+
+
+
                 if (f == null)
                 {
                     nullFrameCounter++;
@@ -273,8 +403,8 @@ namespace WindowsFormsApplication1
                                 fiveSecondData.Add(Math.Abs(maxY - minY)); // The height of the bounding box
                                 fiveSecondData.Add(Math.Abs(maxZ - minZ)); // The depth of the bounding box
                                 fiveSecondData.Add(Convert.ToSingle(f.Timestamp));
-                                
-                                if(frameCounter == 150)
+
+                                if (frameCounter == 150)
                                 {
                                     //Console.WriteLine(fiveSecondData.Count);
                                     // MACHINE LEARNING TO DETECT FALL HERE
@@ -283,15 +413,16 @@ namespace WindowsFormsApplication1
                                     double[][] input = new double[1][];
                                     input[0] = fiveSecondData.ToArray() as double[];
                                     int res = svm.classify(input);
-                                    if(res == 1)
+                                    if (res == 1)
                                     {
                                         tbOutput.AppendText("Fall detected\n");
-                                    }else
+                                    }
+                                    else
                                     {
                                         tbOutput.AppendText("Not Fall\n");
                                     }
                                 }
-                                
+
                                 // Console.WriteLine("Frame no " + frameCounter + " :" + String.Join(",", (string[])data.ToArray(Type.GetType("System.String"))));
                                 //String s = String.Empty;
                                 //foreach (float fl in data)
@@ -331,7 +462,7 @@ namespace WindowsFormsApplication1
 
         private void Kinect_ColorFrameReady(object sender, ColorImageFrameReadyEventArgs e)
         {
-            using ( ColorImageFrame f = e.OpenColorImageFrame())
+            using (ColorImageFrame f = e.OpenColorImageFrame())
             {
                 if (f != null)
                 {
@@ -396,18 +527,18 @@ namespace WindowsFormsApplication1
             //    Console.WriteLine(depthData[i]);
             //}
 
-           // Console.WriteLine(pdata.ToInt32().ToString());
+            // Console.WriteLine(pdata.ToInt32().ToString());
 
             //We want to build a bitmap, hence need an array of bytes
             // The size of the byte array is the width * height *4, 4 since we are doing rgba
             Byte[] colorPixels = new byte[f.Height * f.Width * 4];
             int stride = f.Width * 4;
 
-            const int blueIndex= 0;
+            const int blueIndex = 0;
             const int greenIndex = 1;
             const int redIndex = 2;
 
-            for(int depthIndex =0, colorIndex =0; depthIndex < depthData.Length && colorIndex < colorPixels.Length; depthIndex ++, colorIndex += 4)
+            for (int depthIndex = 0, colorIndex = 0; depthIndex < depthData.Length && colorIndex < colorPixels.Length; depthIndex++, colorIndex += 4)
             {
                 int player = colorPixels[depthIndex] & DepthImageFrame.PlayerIndexBitmask;
 
@@ -451,7 +582,7 @@ namespace WindowsFormsApplication1
                 bitmap = new System.Drawing.Bitmap(outStream);
             }
             return bitmap;
- 
+
 
         }
 
@@ -461,14 +592,14 @@ namespace WindowsFormsApplication1
             this.lblStatus.Text = kinect.Status.ToString();
         }
 
-     
+
         private void DisplayRGB()
         {
             kinect.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
             kinect.ColorFrameReady += Kinect_ColorFrameReady;
         }
 
-        public static byte CalculateIntensityFromDepth(int distance )
+        public static byte CalculateIntensityFromDepth(int distance)
         {
 
             return (byte)(255 - (255 * Math.Max(distance - MinDepthDistance, 0) / (MaxDepthDistanceOffset)));
@@ -478,7 +609,7 @@ namespace WindowsFormsApplication1
         {
 
         }
-        
+
         private void DisplaySkeletal()
         {
 
@@ -486,7 +617,7 @@ namespace WindowsFormsApplication1
 
         private void storeDataTest()
         {
-            
+
         }
 
         private void SVMBtn_Click(object sender, EventArgs e)
@@ -502,6 +633,16 @@ namespace WindowsFormsApplication1
             {
                 svm.classify(new double[1][]);
             }
+        }
+
+        public void AppendToBox(String text)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<string>(AppendToBox), new object[] { text });
+                return;
+            }
+            this.tbOutput.AppendText(text);
         }
     }
 }

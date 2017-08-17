@@ -129,6 +129,7 @@
   <ItemGroup>
     <Compile Include="Contact.cs" />
     <Compile Include="FirebaseRequest.cs" />
+    <Compile Include="FrameObject.cs" />
     <Compile Include="GlobalValues.cs" />
     <Compile Include="MainFrm.cs">
       <SubType>Form</SubType>
@@ -175,6 +176,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Resources\Book1.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
