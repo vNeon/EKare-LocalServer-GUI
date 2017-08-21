@@ -18,8 +18,10 @@ namespace WindowsFormsApplication1
         public string date { get; set; }
         [JsonProperty("imageURL")]
         public string imageURL { get; set; }
-        [JsonProperty("isNew")]
-        public Boolean isNew { get; set; }
+        [JsonProperty("senderSeen")]
+        public Boolean senderSeen { get; set; }
+        [JsonProperty("recieverSeen")]
+        public Boolean recieverSeen { get; set; }
 
         public Message(string message, string sender, string imageURL)
         {
@@ -28,7 +30,8 @@ namespace WindowsFormsApplication1
             this.date = DateTime.Now.ToString("MMM dd");
             this.sender = sender;
             this.imageURL = imageURL;
-            this.isNew = true;
+            this.senderSeen = false;
+            this.recieverSeen = false;
         }
 
     }
