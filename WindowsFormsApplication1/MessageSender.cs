@@ -50,6 +50,7 @@ namespace WindowsFormsApplication1
             string updateInfo = "{\"lastMessage\":\""+lastMessage+"\",\"date\":\""+ messageToContacts.date+"\",\"numNotifications\":\"";
             
             //Get the contact lists again before sending the notification
+            getUserList();
             getContactList();
             foreach (String key in GlobalValues.contacts.Keys)
             {
@@ -66,20 +67,46 @@ namespace WindowsFormsApplication1
 
                 postMessage.executePostRequest(messageToContacts);
                 
-                //Update the latest message and timestamp
+                // Update the latest message and timestamp for the current user
                 String URImessageLog = GlobalValues.FBRTDBURI + "/" + Table.users.ToString() + "/" +GlobalValues.userID+
                                        "/"+Table.contacts.ToString()+"/"+ key+".json?auth=" + GlobalValues.dbSecret;
-                FirebaseRequest postMessageLog = new FirebaseRequest(URImessageLog, httpMethod.POST);
-                int numNotifications = GlobalValues.contacts[key].numNotifications + 1;
-                string json=updateInfo + numNotifications.ToString()+"\"}";
-                postMessageLog.updateMesssageLog(json);
+                FirebaseRequest updateMessageLogPostRequest = new FirebaseRequest(URImessageLog, httpMethod.POST);
+                int numNotifications1 = GlobalValues.contacts[key].numNotifications + 1;
+                string updateUserContactJson=updateInfo + numNotifications1.ToString()+"\"}";
+                updateMessageLogPostRequest.updateNode(updateUserContactJson);
+
+                // Update the lastest message +timestamp + notfications for users contacts
+                String otherContactID = searchContact(GlobalValues.contacts[key].email.ToLower().Trim());
+                String otherContactURI = GlobalValues.FBRTDBURI + "/" + Table.users.ToString() + "/" + otherContactID +
+                                       "/" + Table.contacts.ToString() + "/" + key + ".json?auth=" + GlobalValues.dbSecret;
+                FirebaseRequest updateContactFieldPostRequest = new FirebaseRequest(otherContactURI, httpMethod.POST);
+                int numNotifications2 = GlobalValues.userList[otherContactID].contacts[key].numNotifications + 1;
+                string updateOtherContactJson = updateInfo + numNotifications2.ToString() + "\"}";
+                updateContactFieldPostRequest.updateNode(updateOtherContactJson);
             }
 
         }
 
+        /**
+         * Getting all users from the database, might be inefficient but works for now
+         */
+        private void getUserList()
+        {
+            FirebaseRequest emailRequest = new FirebaseRequest(GlobalValues.FBRTDBURI + "/" + Table.users.ToString()
+                                                                + ".json" + "?auth=" + GlobalValues.dbSecret, httpMethod.GET);
+            emailRequest.makeRequest();
+            String res = emailRequest.executeGetRequest();
+            if (res != null && res != "")
+            {
+                GlobalValues.userList = JsonConvert.DeserializeObject<Dictionary<string, User>>(res);
+            }
+        }
 
+        /**
+         * Get user list of contacts
+         */ 
 
-        public void getContactList()
+        private void getContactList()
         {
             FirebaseRequest contactsRequest = new FirebaseRequest(GlobalValues.FBRTDBURI + "/" + Table.users.ToString()
                                                                     + "/" + GlobalValues.userID + "/contacts.json" + "?auth=" + GlobalValues.dbSecret, httpMethod.GET);
@@ -93,5 +120,21 @@ namespace WindowsFormsApplication1
             }
         }
 
+        /**
+         * Find the current user in other user's contact
+         */
+        private String searchContact(String email)
+        {
+            String otherContactID = null;
+            foreach( String userID in GlobalValues.userList.Keys)
+            {
+                if (GlobalValues.userList[userID].email.ToLower().Trim().Equals(email))
+                {
+                    otherContactID = userID;
+                }
+            }
+
+            return otherContactID;
+        }
     }
 }

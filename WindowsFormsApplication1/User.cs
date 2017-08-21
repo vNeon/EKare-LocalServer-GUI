@@ -21,9 +21,14 @@ namespace WindowsFormsApplication1
         [JsonProperty("phone")]
         public string phone { get; set; }
 
+        [JsonProperty("role")]
+        public string role { get; set; }
+
+        [JsonProperty("contacts")]
+        public Dictionary<String, Contact> contacts { get; set; }
+
         public User()
         {
-
         }
 
 

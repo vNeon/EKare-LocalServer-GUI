@@ -19,13 +19,17 @@ namespace WindowsFormsApplication1
     class GlobalValues
     {
         /// <summary>
-        /// 
+        /// Current user
         /// </summary>
         public static User user;
         /// <summary>
-        /// 
+        /// Current userID
         /// </summary>
         public static string userID;
+        /// <summary>
+        /// List of users
+        /// </summary>
+        public static Dictionary<String, User> userList;
         /// <summary>
         /// 
         /// </summary>

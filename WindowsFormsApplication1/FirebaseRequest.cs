@@ -117,7 +117,7 @@ namespace WindowsFormsApplication1
         /// and update the node in Firebase RT database specified by the endpoint
         /// </summary>
         /// <param name="updateMessage"></param>
-        public async void updateMesssageLog(String updateMessage)
+        public async void updateNode(String updateMessage)
         {
 
             //Update request 
