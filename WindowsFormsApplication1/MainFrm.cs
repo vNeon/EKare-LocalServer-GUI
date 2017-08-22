@@ -25,8 +25,8 @@ namespace WindowsFormsApplication1
     public partial class MainFrm : Form
     {
 
-        private NotificationSender notifier = new NotificationSender();
-        private MessageSender messageSender = new MessageSender();
+        static private NotificationSender notifier = new NotificationSender();
+        static private MessageSender messageSender = new MessageSender();
 
         private String username = String.Empty;
         private KinectSensor kinect;
@@ -37,6 +37,7 @@ namespace WindowsFormsApplication1
         //SVM Model Object
         public SVMTest svm;
         FrameObject prevFrameObject;
+
         static Queue fallMessages = Queue.Synchronized(new Queue());
         
         
@@ -548,9 +549,12 @@ namespace WindowsFormsApplication1
                     if (count == windowSize)
                     {
                         _MainFrm.AppendToBox("Fall Detected!");
-                        
-                        // Add code here to send notification and messages
 
+                        // Add code here to send notification and messages
+                        _MainFrm.AppendToBox(notifier.SendNotification("Send to targeted users"));
+
+                        String message = "Fall Detected! Please check messages for more details.";
+                        messageSender.sendMessageToAllContact(message);
                     }
                 }
             }
