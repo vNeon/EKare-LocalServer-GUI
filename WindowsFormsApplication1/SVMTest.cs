@@ -131,7 +131,13 @@ public class SVMTest
         return zeroOneAnswers[0];
     }
 
-    public void classify()
+    public bool classify()
+    {
+        bool isFall = classify(this.prevFrame, this.newFrame);
+        return isFall;
+    }
+
+    public bool classify(string output)
     {
         bool isFall = classify(this.prevFrame, this.newFrame);
         if (isFall && _MainFrm != null)
@@ -142,6 +148,7 @@ public class SVMTest
         {
             Console.WriteLine("Fall Detected!, Data: " + this.ToString());
         }
+        return isFall;
     }
 
     public bool classify(FrameObject prevFrame, FrameObject newFrame)

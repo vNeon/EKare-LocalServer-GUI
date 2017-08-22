@@ -37,6 +37,9 @@ namespace WindowsFormsApplication1
         //SVM Model Object
         public SVMTest svm;
         FrameObject prevFrameObject;
+        static Queue fallMessages = Queue.Synchronized(new Queue());
+        
+        
 
         private int frameCounter = 0;
         private int nullFrameCounter = 0;
@@ -304,144 +307,17 @@ namespace WindowsFormsApplication1
                                                                 newFrame,
                                                                 _MainFrm);
 
-                            // add reference to the main for message
-                            Thread threadClassify = new Thread(new ThreadStart(threadModel.classify));
-                            threadClassify.Start();
+                            // start thread
+                            BackgroundWorker bg = new BackgroundWorker();
+                            bg.DoWork += new DoWorkEventHandler(bg_DoWork);
+                            bg.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bg_RunWorkerCompleted);
+                            bg.RunWorkerAsync(threadModel);
+
+                            //Thread threadClassify = new Thread(new ThreadStart(threadModel.classify));
+                            //threadClassify.Start();
 
                             prevFrameObject = newFrame;
                         }
-                    }
-                }
-
-
-
-                if (f == null)
-                {
-                    nullFrameCounter++;
-                    return;
-                }
-                else
-                {
-                    var skeletons = new Skeleton[f.SkeletonArrayLength];
-                    f.CopySkeletonDataTo(skeletons);
-                    //counterLbl.Text = DateTime.UtcNow.ToString("ss");
-                    // Find the first person to track
-                    var trackedPerson = skeletons.FirstOrDefault(s => s.TrackingState == SkeletonTrackingState.Tracked);
-
-                    if (trackedPerson != null)
-                    {
-                        if (frameCounter > 150)
-                        {
-                            fiveSecondData.Clear();
-                            frameCounter = 0;
-                        }
-                        else
-                        {
-                            frameCounter++;
-                            // Record every fifth frame
-                            if (frameCounter % 5 == 0)
-                            {
-                                float maxY = -1000;
-                                float minY = -1000;
-                                float maxX = -1000;
-                                float minX = -1000;
-                                float maxZ = -1000;
-                                float minZ = -1000;
-                                foreach (Joint joint in trackedPerson.Joints)
-                                {
-                                    //Console.WriteLine(joint.JointType);
-                                    if (joint.JointType == JointType.HipCenter || joint.JointType == JointType.Spine ||
-                                       joint.JointType == JointType.Head || joint.JointType == JointType.KneeLeft ||
-                                       joint.JointType == JointType.KneeRight)
-                                    {
-                                        fiveSecondData.Add(joint.Position.X);
-                                        fiveSecondData.Add(joint.Position.Y);
-                                        fiveSecondData.Add(joint.Position.Z);
-                                    }
-                                    // Find the max and min coordiates in the X axis
-                                    if (maxY == -1000)
-                                    {
-                                        maxY = joint.Position.Y;
-                                        minY = maxY;
-                                        maxX = joint.Position.X;
-                                        minX = maxX;
-                                        maxZ = joint.Position.Z;
-                                        minZ = maxZ;
-
-                                    }
-                                    else
-                                    {
-                                        if (maxX < joint.Position.X)
-                                        {
-                                            maxX = joint.Position.X;
-                                        }
-                                        if (minX > joint.Position.X)
-                                        {
-                                            minX = joint.Position.X;
-                                        }
-                                        // Find the max and min cooridates in the Y axis
-                                        if (maxY < joint.Position.Y)
-                                        {
-                                            maxY = joint.Position.Y;
-                                        }
-                                        if (minY > joint.Position.Y)
-                                        {
-                                            minY = joint.Position.Y;
-                                        }
-                                        // Find the max and min cooridates in the Z axis
-                                        if (maxZ < joint.Position.Z)
-                                        {
-                                            maxZ = joint.Position.Z;
-                                        }
-                                        if (minZ > joint.Position.Z)
-                                        {
-                                            minZ = joint.Position.Z;
-                                        }
-                                    }
-                                }
-                                fiveSecondData.Add(Math.Abs(maxX - minX)); // The width of the bounding box 
-                                fiveSecondData.Add(Math.Abs(maxY - minY)); // The height of the bounding box
-                                fiveSecondData.Add(Math.Abs(maxZ - minZ)); // The depth of the bounding box
-                                fiveSecondData.Add(Convert.ToSingle(f.Timestamp));
-
-                                if (frameCounter == 150)
-                                {
-                                    //Console.WriteLine(fiveSecondData.Count);
-                                    // MACHINE LEARNING TO DETECT FALL HERE
-                                    // SHOULD CALL ANOTHER FUNCTION
-                                    // MAYBE ON A DIFFERENT THREAD 
-                                    double[][] input = new double[1][];
-                                    input[0] = fiveSecondData.ToArray() as double[];
-                                    int res = svm.classify(input);
-                                    if (res == 1)
-                                    {
-                                        tbOutput.AppendText("Fall detected\n");
-                                    }
-                                    else
-                                    {
-                                        tbOutput.AppendText("Not Fall\n");
-                                    }
-                                }
-
-                                // Console.WriteLine("Frame no " + frameCounter + " :" + String.Join(",", (string[])data.ToArray(Type.GetType("System.String"))));
-                                //String s = String.Empty;
-                                //foreach (float fl in data)
-                                //{
-                                //    s += fl.ToString() + ",";
-                                //}
-                                ////builderForSingleScenario.Append(s);
-                                //if (frameCounter == 150)
-                                //{
-                                //    //builderForSingleScenario.AppendLine(fallornahCb.Checked ? "1" : "0");
-                                //    //builderForCsv.AppendLine(builderForSingleScenario.ToString());
-                                //}
-                                //Console.WriteLine(s);
-
-                            }
-                            frameCounter += nullFrameCounter;
-                            nullFrameCounter = 0;
-                        }
-
                     }
                 }
             }
@@ -643,6 +519,41 @@ namespace WindowsFormsApplication1
                 return;
             }
             this.tbOutput.AppendText(text);
+        }
+
+        static void bg_DoWork(object sender, DoWorkEventArgs e)
+        {
+            SVMTest threadObj = e.Argument as SVMTest;
+            bool result = threadObj.classify();
+            fallMessages.Enqueue(result);
+        }
+
+        static void bg_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            int windowSize = 5;
+            int count = 0;
+
+            lock (fallMessages)
+            {
+                if (fallMessages.Count >= windowSize)
+                {
+                    for (int i = 0; i < windowSize; i++)
+                    {
+                        if ((bool)fallMessages.Dequeue())
+                        {
+                            count++;
+                        }
+                    }
+
+                    if (count == windowSize)
+                    {
+                        _MainFrm.AppendToBox("Fall Detected!");
+                        
+                        // Add code here to send notification and messages
+
+                    }
+                }
+            }
         }
     }
 }
