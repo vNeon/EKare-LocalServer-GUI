@@ -19,7 +19,8 @@ namespace WindowsFormsApplication1
         public async void sendMessageToAllContact(String message)
         {
             // Get any Stream -it can be FileStream, MemoryStream or any other type of Stream
-            var stream = File.Open(@"C:\Users\johnn\Documents\Visual Studio 2015\Projects\WFA-SendMessageToApp\WindowsFormsApplication1\testImage.png", FileMode.Open);
+            var stream = File.Open(Directory.GetCurrentDirectory() + "\\Resources\\n.png", FileMode.Open);
+
 
             string clockID = DateTime.Now.ToString();
             long hashValue = clockID.GetHashCode();
