@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using Firebase.Storage;
 using Newtonsoft.Json;
+using System.Drawing;
 
 namespace WindowsFormsApplication1
 {
@@ -16,28 +17,32 @@ namespace WindowsFormsApplication1
     {
 
 
-        public async void sendMessageToAllContact(String message)
+        public async void sendMessageToAllContact(String message, Bitmap imageAccident)
         {
             // Get any Stream -it can be FileStream, MemoryStream or any other type of Stream
-            var stream = File.Open(Directory.GetCurrentDirectory() + "\\Resources\\n.png", FileMode.Open);
-
+            //var stream = File.Open(Directory.GetCurrentDirectory() + "\\Resources\\n.png", FileMode.Open);
 
             string clockID = DateTime.Now.ToString();
             long hashValue = clockID.GetHashCode();
-            string fileName = GlobalValues.userID + hashValue.ToString()+".png";
+            string fileName = GlobalValues.userID + hashValue.ToString() + ".png";
+            using (MemoryStream ms = new MemoryStream())
+            {
+                imageAccident.Save(fileName, System.Drawing.Imaging.ImageFormat.Png);
+                var stream = File.Open( fileName, FileMode.Open);
+                // Create a png file in 'image' folder of the firebase bucket
+                var task = new FirebaseStorage(GlobalValues.firebaseStorageBucket)
+                    .Child("image")
+                    .Child(fileName)
+                    .PutAsync(stream);
 
-            // Create a png file in 'image' folder of the firebase bucket
-            var task = new FirebaseStorage(GlobalValues.firebaseStorageBucket)
-                .Child("image")
-                .Child(fileName)
-                .PutAsync(stream);
+                // REMOVE LATER
+                //// Track progress of the upload
+                //task.Progress.ProgressChanged += (s, e) => Console.WriteLine($"Progress: {e.Percentage} %");
 
-            // REMOVE LATER
-            //// Track progress of the upload
-            //task.Progress.ProgressChanged += (s, e) => Console.WriteLine($"Progress: {e.Percentage} %");
+                // Await the task to wait until upload completes and get the download url
+                //var downloadUrl = await task;
+            }
 
-            // Await the task to wait until upload completes and get the download url
-            //var downloadUrl = await task;
             Message messageToContacts = new Message(message, GlobalValues.user.email, fileName);
 
             string lastMessage = message;

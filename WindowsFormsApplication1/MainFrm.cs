@@ -24,7 +24,6 @@ namespace WindowsFormsApplication1
 {
     public partial class MainFrm : Form
     {
-
         static private NotificationSender notifier = new NotificationSender();
         static private MessageSender messageSender = new MessageSender();
 
@@ -46,7 +45,7 @@ namespace WindowsFormsApplication1
         private int nullFrameCounter = 0;
 
         private List<double> fiveSecondData = new List<double>();
-
+        public Bitmap scene;
 
         public static MainFrm _MainFrm;
         public MainFrm(String user)
@@ -66,7 +65,8 @@ namespace WindowsFormsApplication1
         private void sendMessageBtn_Click(object sender, EventArgs e)
         {
             String message = messageTb.Text;
-            messageSender.sendMessageToAllContact(message);
+            Bitmap copy = new Bitmap(scene);
+            messageSender.sendMessageToAllContact(message, scene);
         }
 
         /// <summary>
@@ -343,7 +343,10 @@ namespace WindowsFormsApplication1
             {
                 if (f != null)
                 {
-                    videoBox.Image = CreateBitMapFromSensor(f);
+                    Bitmap map = CreateBitMapFromSensor(f);
+                    scene = map;
+                    videoBox.Image = map;
+
                 }
             }
         }
@@ -553,8 +556,8 @@ namespace WindowsFormsApplication1
                         // Add code here to send notification and messages
                         _MainFrm.AppendToBox(notifier.SendNotification("Send to targeted users"));
 
-                        String message = "Fall Detected! Please check messages for more details.";
-                        messageSender.sendMessageToAllContact(message);
+                        String message = "Fall Detected! Please check messages for more details.";      
+                        messageSender.sendMessageToAllContact(message, _MainFrm.scene);
                     }
                 }
             }
