@@ -97,36 +97,9 @@ namespace WindowsFormsApplication1
 
                 kinect.SkeletonStream.Enable();
                 //kinect.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+                addColumnsName();
+            } 
 
-                // assert the column names for the csv file
-                StringBuilder columns = new StringBuilder();
-                string names = "";
-                //names += "H_X,";
-                names += "H_Y,";
-                //names += "H_Z,";
-                //names += "H_Vel_X,";
-                names += "H_Vel_Y,";
-                //names += "H_Vel_Z,";
-                names += "BOX_W,";
-                names += "BOX_H,";
-                names += "BOX_D,";
-                names += "DELTA_BOX_W,";
-                names += "DELTA_BOX_H,";
-                names += "DELTA_BOX_D,";
-                names += "SP_X,";
-                names += "SP_Y,";
-                names += "SP_Z,";
-                //names += "HP_X,";
-                names += "HP_Y,";
-                //names += "HP_Z,";
-                //names += "HP_Vel_X,";
-                names += "HP_Vel_Y,";
-                //names += "HP_Vel_Z,";
-
-                columns.Append(names);
-                columns.Append("Class");
-                builderForCsv.AppendLine(columns.ToString());
-            }
         }
 
         //private void startKinectSensors()
@@ -151,6 +124,39 @@ namespace WindowsFormsApplication1
         //    kinect.SkeletonStream.TrackingMode = SkeletonTrackingMode.Seated;
         //    kinect.SkeletonFrameReady += Kinect_SkeletonFrameReady;
         //}
+
+        private void addColumnsName()
+        {
+            // assert the column names for the csv file
+            StringBuilder columns = new StringBuilder();
+            string names = "";
+            //names += "H_X,";
+            names += "H_Y,";
+            //names += "H_Z,";
+            //names += "H_Vel_X,";
+            names += "H_Vel_Y,";
+            //names += "H_Vel_Z,";
+            names += "BOX_W,";
+            names += "BOX_H,";
+            names += "BOX_D,";
+            names += "DELTA_BOX_W,";
+            names += "DELTA_BOX_H,";
+            names += "DELTA_BOX_D,";
+            names += "SP_X,";
+            names += "SP_Y,";
+            names += "SP_Z,";
+            //names += "HP_X,";
+            names += "HP_Y,";
+            //names += "HP_Z,";
+            //names += "HP_Vel_X,";
+            names += "HP_Vel_Y,";
+            names += "H2F_Y,";
+            //names += "HP_Vel_Z,";
+
+            columns.Append(names);
+            columns.Append("Class");
+            builderForCsv.AppendLine(columns.ToString());
+    }
 
         private void radioButton_CheckedChanged(object sender, EventArgs e)
         {
@@ -320,28 +326,46 @@ namespace WindowsFormsApplication1
 
                             if (isRecording)
                             {
+                                // Default distance incase the floor is not detected
+                                double headToFloorDistance = 1000;
+                                if (!(f.FloorClipPlane.Item1 ==0 && f.FloorClipPlane.Item2 == 0 && f.FloorClipPlane.Item3 ==0 && f.FloorClipPlane.Item4 == 0))
+                                {
+                                    //Floor equation
+                                    float floorA = f.FloorClipPlane.Item1;
+                                    float floorB = f.FloorClipPlane.Item2;
+                                    float floorC = f.FloorClipPlane.Item3;
+                                    float floorD = f.FloorClipPlane.Item4;
+
+                                    //Calculate the distance between Head and Floor
+                                    headToFloorDistance = floorA * headX + floorB * headY + floorC * headZ + floorD;
+                                    // Scale distance 
+                                    headToFloorDistance *= 1000;
+                                }
+                                
                                 //Add to data
-                                long timeDifference = newFrame.Timestamp - prevFrameObject.Timestamp;
+                                var timeDifference = Convert.ToSingle(newFrame.Timestamp - prevFrameObject.Timestamp);
+                                Console.WriteLine(timeDifference);
                                 //data.Add(newFrame.HeadX);
-                                data.Add(newFrame.HeadY);
+                                data.Add(newFrame.HeadY *1000);
                                 //data.Add(newFrame.HeadZ);
                                 //data.Add((newFrame.HeadX - prevFrameObject.HeadX) / (timeDifference));
-                                data.Add((newFrame.HeadY - prevFrameObject.HeadY) / (timeDifference));
+                                data.Add((newFrame.HeadY - prevFrameObject.HeadY) *1000 * 1000 / (timeDifference));
                                 //data.Add((newFrame.HeadZ - prevFrameObject.HeadZ) / (timeDifference));
-                                data.Add(newFrame.BoxW);
-                                data.Add(newFrame.BoxH);
-                                data.Add(newFrame.BoxD);
-                                data.Add((newFrame.BoxW - prevFrameObject.BoxW) / (timeDifference));
-                                data.Add((newFrame.BoxH - prevFrameObject.BoxH) / (timeDifference));
-                                data.Add((newFrame.BoxD - prevFrameObject.BoxD) / (timeDifference));
-                                data.Add(newFrame.SpineX);
-                                data.Add(newFrame.SpineY);
-                                data.Add(newFrame.SpineZ);
+                                data.Add(newFrame.BoxW * 1000);
+                                data.Add(newFrame.BoxH * 1000);
+                                data.Add(newFrame.BoxD * 1000);
+                                data.Add((newFrame.BoxW - prevFrameObject.BoxW) * 1000 * 1000 / (timeDifference));
+                                data.Add((newFrame.BoxH - prevFrameObject.BoxH) * 1000 * 1000 / (timeDifference));
+                                data.Add((newFrame.BoxD - prevFrameObject.BoxD) * 1000 * 1000 / (timeDifference));
+                                data.Add(newFrame.SpineX * 1000);
+                                data.Add(newFrame.SpineY * 1000);
+                                data.Add(newFrame.SpineZ * 1000);
                                 //data.Add(newFrame.HipX);
-                                data.Add(newFrame.HipY);
+                                data.Add(newFrame.HipY * 1000);
                                 //data.Add(newFrame.HipZ);
                                 //data.Add((newFrame.HipX - prevFrameObject.HipX) / (timeDifference));
-                                data.Add((newFrame.HipY - prevFrameObject.HipY) / (timeDifference));
+                                data.Add((newFrame.HipY - prevFrameObject.HipY) * 1000 * 1000 / (timeDifference));
+                                data.Add(headToFloorDistance);
                                 //data.Add((newFrame.HipZ - prevFrameObject.HipZ) / (timeDifference));
 
                                 // Console.WriteLine("Frame no " + frameCounter + " :" + String.Join(",", (string[])data.ToArray(Type.GetType("System.String"))));
@@ -349,6 +373,7 @@ namespace WindowsFormsApplication1
                                 foreach (double fl in data)
                                 {
                                     s += fl.ToString() + ",";
+                                    s += (fallornahCb.Checked ? "1" : "0");
                                 }
                                 builderForCsv.AppendLine(s);
                                 Console.WriteLine(s);
@@ -637,6 +662,8 @@ namespace WindowsFormsApplication1
             }
             Console.WriteLine(csvPath);
             File.AppendAllText(csvPath, builderForCsv.ToString());
+            builderForCsv.Clear();
+            addColumnsName();
         }
 
         private void removeBtn_Click(object sender, EventArgs e)

@@ -10,6 +10,8 @@ using System.Windows.Forms;
 using System.Net;
 using System.IO;
 using Newtonsoft.Json;
+using FallDetetionService;
+
 namespace WindowsFormsApplication1
 {
     public partial class LoginFrm : Form
@@ -82,11 +84,16 @@ namespace WindowsFormsApplication1
             Console.WriteLine(res);
             if (res != null && res != "")
             {
-                Dictionary<String, String> jsonTemp = JsonConvert.DeserializeObject<Dictionary<String, String>>(res);
+                Dictionary<String, Contact> jsonTemp = JsonConvert.DeserializeObject<Dictionary<String, Contact>>(res);
                 GlobalValues.contacts = jsonTemp;
             }
         }
         private void LoginFrm_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void emailTb_TextChanged(object sender, EventArgs e)
         {
 
         }
