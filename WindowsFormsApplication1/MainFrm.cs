@@ -130,28 +130,117 @@ namespace WindowsFormsApplication1
             // assert the column names for the csv file
             StringBuilder columns = new StringBuilder();
             string names = "";
-            //names += "H_X,";
-            names += "H_Y,";
-            //names += "H_Z,";
-            //names += "H_Vel_X,";
-            names += "H_Vel_Y,";
-            //names += "H_Vel_Z,";
-            names += "BOX_W,";
-            names += "BOX_H,";
-            names += "BOX_D,";
-            names += "DELTA_BOX_W,";
-            names += "DELTA_BOX_H,";
-            names += "DELTA_BOX_D,";
-            names += "SP_X,";
-            names += "SP_Y,";
-            names += "SP_Z,";
-            //names += "HP_X,";
-            names += "HP_Y,";
-            //names += "HP_Z,";
-            //names += "HP_Vel_X,";
-            names += "HP_Vel_Y,";
-            names += "H2F_Y,";
-            //names += "HP_Vel_Z,";
+            names += "Head_X,";
+            names += "Head_Y,";
+            names += "Head_Z,";
+
+            names += "AnkleLeft_X,";
+            names += "AnkleLeft_Y,";
+            names += "AnkleLeft_Z,";
+
+            names += "AnkleRight_X,";
+            names += "AnkleRight_Y,";
+            names += "AnkleRight_Z,";
+
+            names += "ElbowLeft_X,";
+            names += "ElbowLeft_Y,";
+            names += "ElbowLeft_Z,";
+
+            names += "ElbowRight_X,";
+            names += "ElbowRight_Y,";
+            names += "ElbowRight_Z,";
+
+            names += "FootLeft_X,";
+            names += "FootLeft_Y,";
+            names += "FootLeft_Z,";
+
+            names += "FootRight_X,";
+            names += "FootRight_Y,";
+            names += "FootRight_Z,";
+
+            names += "HandLeft_X,";
+            names += "HandLeft_Y,";
+            names += "HandLeft_Z,";
+
+            names += "HandRight_X,";
+            names += "HandRight_Y,";
+            names += "HandRight_Z,";
+
+            names += "HipCenter_X,";
+            names += "HipCenter_Y,";
+            names += "HipCenter_Z,";
+
+            names += "HipLeft_X,";
+            names += "HipLeft_Y,";
+            names += "HipLeft_Z,";
+
+            names += "HipRight_X,";
+            names += "HipRight_Y,";
+            names += "HipRight_Z,";
+
+            names += "KneeLeft_X,";
+            names += "KneeLeft_Y,";
+            names += "KneeLeft_Z,";
+
+            names += "KneeRight_X,";
+            names += "KneeRight_Y,";
+            names += "KneeRight_Z,";
+
+            names += "ShoulderCenter_X,";
+            names += "ShoulderCenter_Y,";
+            names += "ShoulderCenter_Z,";
+
+            names += "ShoulderRight_X,";
+            names += "ShoulderRight_Y,";
+            names += "ShoulderRight_Z,";
+
+            names += "ShoulderLeft_X,";
+            names += "ShoulderLeft_Y,";
+            names += "ShoulderLeft_Z,";
+
+            names += "Spine_X,";
+            names += "Spine_Y,";
+            names += "Spine_Z,";
+
+            names += "WristLeft_X,";
+            names += "WristLeft_Y,";
+            names += "WristLeft_Z,";
+
+            names += "WristRight_X,";
+            names += "WristRight_Y,";
+            names += "WristRight_Z,";
+
+            names += "Floor_A,";
+            names += "Floor_B,";
+            names += "Floor_C,";
+            names += "Floor_D,";
+
+            names += "Timestamp,";
+
+            names += "FrameCounter,";
+
+            ////names += "H_X,";
+            //names += "H_Y,";
+            ////names += "H_Z,";
+            ////names += "H_Vel_X,";
+            //names += "H_Vel_Y,";
+            ////names += "H_Vel_Z,";
+            //names += "BOX_W,";
+            //names += "BOX_H,";
+            //names += "BOX_D,";
+            //names += "DELTA_BOX_W,";
+            //names += "DELTA_BOX_H,";
+            //names += "DELTA_BOX_D,";
+            //names += "SP_X,";
+            //names += "SP_Y,";
+            //names += "SP_Z,";
+            ////names += "HP_X,";
+            //names += "HP_Y,";
+            ////names += "HP_Z,";
+            ////names += "HP_Vel_X,";
+            //names += "HP_Vel_Y,";
+            //names += "H2F_Y,";
+            ////names += "HP_Vel_Z,";
 
             columns.Append(names);
             columns.Append("Class");
@@ -224,7 +313,8 @@ namespace WindowsFormsApplication1
                     if (trackedPerson != null)
                     {
                         // do recording stuff
-                        if (isRecording && (endRecording < DateTime.UtcNow)/*To do recording finished*/)
+                        //if (isRecording && (endRecording < DateTime.UtcNow)/*To do recording finished*/)
+                        if(isRecording && (frameCounter >= 30))
                         {
                             radioButton4.Checked = true;
                             kinect.SkeletonFrameReady -= Kinect_SkeletonFrameReady;
@@ -236,172 +326,276 @@ namespace WindowsFormsApplication1
                         List<double> data = new List<double>();
                         List<double> raw_data = new List<double>();
 
-                        float maxY = -1000;
-                        float minY = -1000;
-                        float maxX = -1000;
-                        float minX = -1000;
-                        float maxZ = -1000;
-                        float minZ = -1000;
+                        raw_data.Add(trackedPerson.Joints[JointType.Head].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.Head].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.Head].Position.Z);
 
-                        float boxW = 0;
-                        float boxH = 0;
-                        float boxD = 0;
+                        raw_data.Add(trackedPerson.Joints[JointType.AnkleLeft].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.AnkleLeft].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.AnkleLeft].Position.Z);
 
-                        double headX = trackedPerson.Joints[JointType.Head].Position.X;
-                        double headY = trackedPerson.Joints[JointType.Head].Position.Y;
-                        double headZ = trackedPerson.Joints[JointType.Head].Position.Z;
+                        raw_data.Add(trackedPerson.Joints[JointType.AnkleRight].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.AnkleRight].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.AnkleRight].Position.Z);
 
-                        float shoulderCenterX = trackedPerson.Joints[JointType.ShoulderCenter].Position.X;
-                        float shoulderCenterY = trackedPerson.Joints[JointType.ShoulderCenter].Position.Y;
-                        float shoulderCenterZ = trackedPerson.Joints[JointType.ShoulderCenter].Position.Z;
+                        raw_data.Add(trackedPerson.Joints[JointType.ElbowLeft].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.ElbowLeft].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.ElbowLeft].Position.Z);
 
-                        Vector3 shoulderCenter = new Vector3(shoulderCenterX, shoulderCenterY, shoulderCenterZ);
+                        raw_data.Add(trackedPerson.Joints[JointType.ElbowRight].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.ElbowRight].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.ElbowRight].Position.Z);
 
-                        float hipCenterX = trackedPerson.Joints[JointType.HipCenter].Position.X;
-                        float hipCenterY = trackedPerson.Joints[JointType.HipCenter].Position.Y;
-                        float hipCenterZ = trackedPerson.Joints[JointType.HipCenter].Position.Z;
+                        raw_data.Add(trackedPerson.Joints[JointType.FootLeft].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.FootLeft].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.FootLeft].Position.Z);
 
-                        Vector3 hipCenter = new Vector3(hipCenterX, hipCenterY, hipCenterZ);
+                        raw_data.Add(trackedPerson.Joints[JointType.FootRight].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.FootRight].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.FootRight].Position.Z);
 
-                        Vector3 spine = shoulderCenter - hipCenter;
-                        spine.Normalize();
+                        raw_data.Add(trackedPerson.Joints[JointType.HandLeft].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.HandLeft].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.HandLeft].Position.Z);
 
-                        foreach (Joint joint in trackedPerson.Joints)
+                        raw_data.Add(trackedPerson.Joints[JointType.HandRight].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.HandRight].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.HandRight].Position.Z);
+
+                        raw_data.Add(trackedPerson.Joints[JointType.HipCenter].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.HipCenter].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.HipCenter].Position.Z);
+
+                        raw_data.Add(trackedPerson.Joints[JointType.HipLeft].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.HipLeft].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.HipLeft].Position.Z);
+
+                        raw_data.Add(trackedPerson.Joints[JointType.HipRight].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.HipRight].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.HipRight].Position.Z);
+
+                        raw_data.Add(trackedPerson.Joints[JointType.KneeLeft].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.KneeLeft].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.KneeLeft].Position.Z);
+
+                        raw_data.Add(trackedPerson.Joints[JointType.KneeRight].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.KneeRight].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.KneeRight].Position.Z);
+
+                        raw_data.Add(trackedPerson.Joints[JointType.ShoulderCenter].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.ShoulderCenter].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.ShoulderCenter].Position.Z);
+
+                        raw_data.Add(trackedPerson.Joints[JointType.ShoulderRight].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.ShoulderRight].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.ShoulderRight].Position.Z);
+
+                        raw_data.Add(trackedPerson.Joints[JointType.ShoulderLeft].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.ShoulderLeft].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.ShoulderLeft].Position.Z);
+
+                        raw_data.Add(trackedPerson.Joints[JointType.Spine].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.Spine].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.Spine].Position.Z);
+
+                        raw_data.Add(trackedPerson.Joints[JointType.WristLeft].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.WristLeft].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.WristLeft].Position.Z);
+
+                        raw_data.Add(trackedPerson.Joints[JointType.WristRight].Position.X);
+                        raw_data.Add(trackedPerson.Joints[JointType.WristRight].Position.Y);
+                        raw_data.Add(trackedPerson.Joints[JointType.WristRight].Position.Z);
+
+                        raw_data.Add(f.FloorClipPlane.Item1);
+                        raw_data.Add(f.FloorClipPlane.Item2);
+                        raw_data.Add(f.FloorClipPlane.Item3);
+                        raw_data.Add(f.FloorClipPlane.Item4);
+
+                        raw_data.Add(f.Timestamp);
+
+                        raw_data.Add(frameCounter);
+
+                        string s = String.Empty;
+                        foreach (double fl in raw_data)
                         {
-                            //Console.WriteLine(joint.JointType);
-                            // Find the max and min coordiates in the X axis
-                            if (maxY == -1000)
-                            {
-                                maxY = joint.Position.Y;
-                                minY = maxY;
-                                maxX = joint.Position.X;
-                                minX = maxX;
-                                maxZ = joint.Position.Z;
-                                minZ = maxZ;
-                            }
-                            else
-                            {
-                                if (maxX < joint.Position.X)
-                                {
-                                    maxX = joint.Position.X;
-                                }
-                                if (minX > joint.Position.X)
-                                {
-                                    minX = joint.Position.X;
-                                }
-                                // Find the max and min cooridates in the Y axis
-                                if (maxY < joint.Position.Y)
-                                {
-                                    maxY = joint.Position.Y;
-                                }
-                                if (minY > joint.Position.Y)
-                                {
-                                    minY = joint.Position.Y;
-                                }
-                                // Find the max and min cooridates in the Z axis
-                                if (maxZ < joint.Position.Z)
-                                {
-                                    maxZ = joint.Position.Z;
-                                }
-                                if (minZ > joint.Position.Z)
-                                {
-                                    minZ = joint.Position.Z;
-                                }
-                            }
+                            s += fl.ToString() + ",";
+                            s += (fallornahCb.Checked ? "1" : "0");
                         }
+                        builderForCsv.AppendLine(s);
 
-                        boxW = Math.Abs(maxX - minX); // The width of the bounding box 
-                        boxH = Math.Abs(maxY - minY); // The height of the bounding box
-                        boxD = Math.Abs(maxZ - minZ); // The depth of the bounding box
+                        frameCounter++;
 
-                        if (prevFrameObject == null || (f.Timestamp - prevFrameObject.Timestamp) > 1000)
-                        {
-                            prevFrameObject = new FrameObject(f.Timestamp, headX, headY, headZ, boxW, boxH, boxD, spine.X, spine.Y, spine.Z, hipCenterX, hipCenterY, hipCenterZ);
-                            Console.WriteLine((f.Timestamp));
-                            Console.WriteLine((prevFrameObject.Timestamp));
-                        }
-                        else
-                        {
-                            FrameObject newFrame = new FrameObject(f.Timestamp, headX, headY, headZ, boxW, boxH, boxD, spine.X, spine.Y, spine.Z, hipCenterX, hipCenterY, hipCenterZ);
+                        //float maxY = -1000;
+                        //float minY = -1000;
+                        //float maxX = -1000;
+                        //float minX = -1000;
+                        //float maxZ = -1000;
+                        //float minZ = -1000;
 
-                            if (isRecording)
-                            {
-                                // Default distance incase the floor is not detected
-                                double headToFloorDistance = 1000;
-                                if (!(f.FloorClipPlane.Item1 ==0 && f.FloorClipPlane.Item2 == 0 && f.FloorClipPlane.Item3 ==0 && f.FloorClipPlane.Item4 == 0))
-                                {
-                                    //Floor equation
-                                    float floorA = f.FloorClipPlane.Item1;
-                                    float floorB = f.FloorClipPlane.Item2;
-                                    float floorC = f.FloorClipPlane.Item3;
-                                    float floorD = f.FloorClipPlane.Item4;
+                        //float boxW = 0;
+                        //float boxH = 0;
+                        //float boxD = 0;
 
-                                    //Calculate the distance between Head and Floor
-                                    headToFloorDistance = floorA * headX + floorB * headY + floorC * headZ + floorD;
-                                    // Scale distance 
-                                    headToFloorDistance *= 1000;
-                                }
-                                
-                                //Add to data
-                                var timeDifference = Convert.ToSingle(newFrame.Timestamp - prevFrameObject.Timestamp);
-                                Console.WriteLine(timeDifference);
-                                //data.Add(newFrame.HeadX);
-                                data.Add(newFrame.HeadY *1000);
-                                //data.Add(newFrame.HeadZ);
-                                //data.Add((newFrame.HeadX - prevFrameObject.HeadX) / (timeDifference));
-                                data.Add((newFrame.HeadY - prevFrameObject.HeadY) *1000 * 1000 / (timeDifference));
-                                //data.Add((newFrame.HeadZ - prevFrameObject.HeadZ) / (timeDifference));
-                                data.Add(newFrame.BoxW * 1000);
-                                data.Add(newFrame.BoxH * 1000);
-                                data.Add(newFrame.BoxD * 1000);
-                                data.Add((newFrame.BoxW - prevFrameObject.BoxW) * 1000 * 1000 / (timeDifference));
-                                data.Add((newFrame.BoxH - prevFrameObject.BoxH) * 1000 * 1000 / (timeDifference));
-                                data.Add((newFrame.BoxD - prevFrameObject.BoxD) * 1000 * 1000 / (timeDifference));
-                                data.Add(newFrame.SpineX * 1000);
-                                data.Add(newFrame.SpineY * 1000);
-                                data.Add(newFrame.SpineZ * 1000);
-                                //data.Add(newFrame.HipX);
-                                data.Add(newFrame.HipY * 1000);
-                                //data.Add(newFrame.HipZ);
-                                //data.Add((newFrame.HipX - prevFrameObject.HipX) / (timeDifference));
-                                data.Add((newFrame.HipY - prevFrameObject.HipY) * 1000 * 1000 / (timeDifference));
-                                data.Add(headToFloorDistance);
-                                //data.Add((newFrame.HipZ - prevFrameObject.HipZ) / (timeDifference));
+                        //double headX = trackedPerson.Joints[JointType.Head].Position.X;
+                        //double headY = trackedPerson.Joints[JointType.Head].Position.Y;
+                        //double headZ = trackedPerson.Joints[JointType.Head].Position.Z;
 
-                                // Console.WriteLine("Frame no " + frameCounter + " :" + String.Join(",", (string[])data.ToArray(Type.GetType("System.String"))));
-                                String s = String.Empty;
-                                foreach (double fl in data)
-                                {
-                                    s += fl.ToString() + ",";
-                                    s += (fallornahCb.Checked ? "1" : "0");
-                                }
-                                builderForCsv.AppendLine(s);
-                                Console.WriteLine(s);
-                            }
-                            else
-                            {
-                                // if classify create object, then change the prevFrame
-                                if (svm == null)
-                                {
-                                    // Change to training data location
-                                    string trainingDataPath = Directory.GetCurrentDirectory() + "\\Resources\\Book1.xlsx";
-                                    svm = new SVMTest(trainingDataPath);
-                                    svm.buildModel();
-                                }
-                                //run algorithm 
+                        //float shoulderCenterX = trackedPerson.Joints[JointType.ShoulderCenter].Position.X;
+                        //float shoulderCenterY = trackedPerson.Joints[JointType.ShoulderCenter].Position.Y;
+                        //float shoulderCenterZ = trackedPerson.Joints[JointType.ShoulderCenter].Position.Z;
 
-                                SVMTest threadModel = new SVMTest((Accord.MachineLearning.VectorMachines.SupportVectorMachine)svm.svmModel.Clone(),
-                                                                    prevFrameObject,
-                                                                    newFrame,
-                                                                    _MainFrm);
+                        //Vector3 shoulderCenter = new Vector3(shoulderCenterX, shoulderCenterY, shoulderCenterZ);
 
-                                // add reference to the main for message
-                                Thread threadClassify = new Thread(new ThreadStart(threadModel.classify));
-                                threadClassify.Start();
-                            }
+                        //float hipCenterX = trackedPerson.Joints[JointType.HipCenter].Position.X;
+                        //float hipCenterY = trackedPerson.Joints[JointType.HipCenter].Position.Y;
+                        //float hipCenterZ = trackedPerson.Joints[JointType.HipCenter].Position.Z;
 
-                            prevFrameObject = newFrame;
-                        }
+                        //Vector3 hipCenter = new Vector3(hipCenterX, hipCenterY, hipCenterZ);
+
+                        //Vector3 spine = shoulderCenter - hipCenter;
+                        //spine.Normalize();
+
+                        //foreach (Joint joint in trackedPerson.Joints)
+                        //{
+
+
+                        // Get all joints
+
+                        //Console.WriteLine(joint.JointType);
+                        // Find the max and min coordiates in the X axis
+                        //    if (maxY == -1000)
+                        //    {
+                        //        maxY = joint.Position.Y;
+                        //        minY = maxY;
+                        //        maxX = joint.Position.X;
+                        //        minX = maxX;
+                        //        maxZ = joint.Position.Z;
+                        //        minZ = maxZ;
+                        //    }
+                        //    else
+                        //    {
+                        //        if (maxX < joint.Position.X)
+                        //        {
+                        //            maxX = joint.Position.X;
+                        //        }
+                        //        if (minX > joint.Position.X)
+                        //        {
+                        //            minX = joint.Position.X;
+                        //        }
+                        //        // Find the max and min cooridates in the Y axis
+                        //        if (maxY < joint.Position.Y)
+                        //        {
+                        //            maxY = joint.Position.Y;
+                        //        }
+                        //        if (minY > joint.Position.Y)
+                        //        {
+                        //            minY = joint.Position.Y;
+                        //        }
+                        //        // Find the max and min cooridates in the Z axis
+                        //        if (maxZ < joint.Position.Z)
+                        //        {
+                        //            maxZ = joint.Position.Z;
+                        //        }
+                        //        if (minZ > joint.Position.Z)
+                        //        {
+                        //            minZ = joint.Position.Z;
+                        //        }
+                        //    }
+                        //}
+
+                        //boxW = Math.Abs(maxX - minX); // The width of the bounding box 
+                        //boxH = Math.Abs(maxY - minY); // The height of the bounding box
+                        //boxD = Math.Abs(maxZ - minZ); // The depth of the bounding box
+
+                        //if (prevFrameObject == null || (f.Timestamp - prevFrameObject.Timestamp) > 1000)
+                        //{
+                        //    prevFrameObject = new FrameObject(f.Timestamp, headX, headY, headZ, boxW, boxH, boxD, spine.X, spine.Y, spine.Z, hipCenterX, hipCenterY, hipCenterZ);
+                        //    Console.WriteLine((f.Timestamp));
+                        //    Console.WriteLine((prevFrameObject.Timestamp));
+                        //}
+                        //else
+                        //{
+                        //    FrameObject newFrame = new FrameObject(f.Timestamp, headX, headY, headZ, boxW, boxH, boxD, spine.X, spine.Y, spine.Z, hipCenterX, hipCenterY, hipCenterZ);
+
+                        //    if (isRecording)
+                        //    {
+                        //        // Default distance incase the floor is not detected
+                        //        double headToFloorDistance = 1000;
+                        //        if (!(f.FloorClipPlane.Item1 ==0 && f.FloorClipPlane.Item2 == 0 && f.FloorClipPlane.Item3 ==0 && f.FloorClipPlane.Item4 == 0))
+                        //        {
+                        //            //Floor equation
+                        //            float floorA = f.FloorClipPlane.Item1;
+                        //            float floorB = f.FloorClipPlane.Item2;
+                        //            float floorC = f.FloorClipPlane.Item3;
+                        //            float floorD = f.FloorClipPlane.Item4;
+
+                        //            //Calculate the distance between Head and Floor
+                        //            headToFloorDistance = floorA * headX + floorB * headY + floorC * headZ + floorD;
+                        //            // Scale distance 
+                        //            headToFloorDistance *= 1000;
+                        //        }
+
+                        //        //Add to data
+                        //        var timeDifference = Convert.ToSingle(newFrame.Timestamp - prevFrameObject.Timestamp);
+                        //        Console.WriteLine(timeDifference);
+                        //        //data.Add(newFrame.HeadX);
+                        //        data.Add(newFrame.HeadY *1000);
+                        //        //data.Add(newFrame.HeadZ);
+                        //        //data.Add((newFrame.HeadX - prevFrameObject.HeadX) / (timeDifference));
+                        //        data.Add((newFrame.HeadY - prevFrameObject.HeadY) *1000 * 1000 / (timeDifference));
+                        //        //data.Add((newFrame.HeadZ - prevFrameObject.HeadZ) / (timeDifference));
+                        //        data.Add(newFrame.BoxW * 1000);
+                        //        data.Add(newFrame.BoxH * 1000);
+                        //        data.Add(newFrame.BoxD * 1000);
+                        //        data.Add((newFrame.BoxW - prevFrameObject.BoxW) * 1000 * 1000 / (timeDifference));
+                        //        data.Add((newFrame.BoxH - prevFrameObject.BoxH) * 1000 * 1000 / (timeDifference));
+                        //        data.Add((newFrame.BoxD - prevFrameObject.BoxD) * 1000 * 1000 / (timeDifference));
+                        //        data.Add(newFrame.SpineX * 1000);
+                        //        data.Add(newFrame.SpineY * 1000);
+                        //        data.Add(newFrame.SpineZ * 1000);
+                        //        //data.Add(newFrame.HipX);
+                        //        data.Add(newFrame.HipY * 1000);
+                        //        //data.Add(newFrame.HipZ);
+                        //        //data.Add((newFrame.HipX - prevFrameObject.HipX) / (timeDifference));
+                        //        data.Add((newFrame.HipY - prevFrameObject.HipY) * 1000 * 1000 / (timeDifference));
+                        //        data.Add(headToFloorDistance);
+                        //        //data.Add((newFrame.HipZ - prevFrameObject.HipZ) / (timeDifference));
+
+                        //        // Console.WriteLine("Frame no " + frameCounter + " :" + String.Join(",", (string[])data.ToArray(Type.GetType("System.String"))));
+                        //        String s = String.Empty;
+                        //        foreach (double fl in data)
+                        //        {
+                        //            s += fl.ToString() + ",";
+                        //            s += (fallornahCb.Checked ? "1" : "0");
+                        //        }
+                        //        builderForCsv.AppendLine(s);
+                        //        Console.WriteLine(s);
+                        //    }
+                        //    else
+                        //    {
+                        //        // if classify create object, then change the prevFrame
+                        //        if (svm == null)
+                        //        {
+                        //            // Change to training data location
+                        //            string trainingDataPath = Directory.GetCurrentDirectory() + "\\Resources\\Book1.xlsx";
+                        //            svm = new SVMTest(trainingDataPath);
+                        //            svm.buildModel();
+                        //        }
+                        //        //run algorithm 
+
+                        //        SVMTest threadModel = new SVMTest((Accord.MachineLearning.VectorMachines.SupportVectorMachine)svm.svmModel.Clone(),
+                        //                                            prevFrameObject,
+                        //                                            newFrame,
+                        //                                            _MainFrm);
+
+                        //        // add reference to the main for message
+                        //        Thread threadClassify = new Thread(new ThreadStart(threadModel.classify));
+                        //        threadClassify.Start();
+                        //    }
+
+                        //    prevFrameObject = newFrame;
+                        //}
+                        //}
                     }
                 }
             }
@@ -618,7 +812,7 @@ namespace WindowsFormsApplication1
             var start = DateTime.UtcNow; // Use UtcNow instead of Now
             endCounter = start.AddSeconds(seconds); //endTime is a member, not a local variable
             isRecording = true;
-            endRecording = endCounter.AddSeconds(15);
+            endRecording = endCounter.AddSeconds(6);
             timer1.Enabled = true;
 
         }
@@ -653,11 +847,11 @@ namespace WindowsFormsApplication1
 
         private void saveBtn_Click(object sender, EventArgs e)
         {
-            string csvPath = Directory.GetCurrentDirectory() + "/trainingdata.csv";
+            string csvPath = Directory.GetCurrentDirectory() + "/rawdata.csv";
             int counter = 1;
             while (File.Exists(csvPath))
             {
-                csvPath = Directory.GetCurrentDirectory() + "/trainingdata" + counter + ".csv";
+                csvPath = Directory.GetCurrentDirectory() + "/rawdata" + counter + ".csv";
                 counter++;
             }
             Console.WriteLine(csvPath);
