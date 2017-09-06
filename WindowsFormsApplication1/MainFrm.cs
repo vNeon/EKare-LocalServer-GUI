@@ -416,10 +416,14 @@ namespace WindowsFormsApplication1
                         raw_data.Add(frameCounter);
 
                         string s = String.Empty;
-                        foreach (double fl in raw_data)
+                        for(int index = 0; index <raw_data.Count; index++)
                         {
-                            s += fl.ToString() + ",";
-                            s += (fallornahCb.Checked ? "1" : "0");
+
+                            s += raw_data[index].ToString() + ",";
+                            if (index == raw_data.Count - 1)
+                            {
+                                s += (fallornahCb.Checked ? "1" : "0");
+                            }
                         }
                         builderForCsv.AppendLine(s);
 
