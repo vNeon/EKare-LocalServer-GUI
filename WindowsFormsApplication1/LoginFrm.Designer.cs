@@ -76,8 +76,10 @@
             // 
             this.passwordTb.Location = new System.Drawing.Point(106, 109);
             this.passwordTb.Name = "passwordTb";
+            this.passwordTb.PasswordChar = '*';
             this.passwordTb.Size = new System.Drawing.Size(213, 22);
             this.passwordTb.TabIndex = 4;
+            this.passwordTb.Text = "aaa111";
             // 
             // loginBtn
             // 

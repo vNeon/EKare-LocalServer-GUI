@@ -20,7 +20,7 @@ public class SVMTest
     public double[][] inputs;
     public int[] outputs;
     List<double> data;
-    MainFrm _MainFrm;
+    Temp _MainFrm;
     FrameObject prevFrame { get; set; }
     FrameObject newFrame { get; set; }
 
@@ -94,12 +94,12 @@ public class SVMTest
     public SVMTest(Accord.MachineLearning.VectorMachines.SupportVectorMachine<Gaussian> svmModel,
             FrameObject prevFrame,
             FrameObject newFrame,
-            MainFrm _MainFrm)
+            Form _MainFrm)
     {
         this.svmModel = svmModel;
         this.prevFrame = prevFrame;
         this.newFrame = newFrame;
-        this._MainFrm = _MainFrm;
+        this._MainFrm = (Temp)_MainFrm;
     }
 
     public Accord.MachineLearning.VectorMachines.SupportVectorMachine<Gaussian> buildModel()

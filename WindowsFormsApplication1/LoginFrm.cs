@@ -34,7 +34,8 @@ namespace WindowsFormsApplication1
             else
             {
                 this.Hide();
-                MainFrm mainForm = new MainFrm(userName);
+                //MainFrm mainForm = new MainFrm(userName);
+                Temp mainForm = new Temp(userName);
                 mainForm.Show();
             }
         }
