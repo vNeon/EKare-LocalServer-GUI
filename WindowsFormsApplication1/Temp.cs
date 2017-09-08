@@ -382,6 +382,8 @@ namespace WindowsFormsApplication1
             g.DrawSkeleton(body, skeletonImage.Width, skeletonImage.Height);
         }
         #endregion
+
+
     }
 }
 
