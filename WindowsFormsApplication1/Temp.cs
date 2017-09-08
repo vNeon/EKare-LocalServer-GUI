@@ -62,7 +62,7 @@ namespace WindowsFormsApplication1
         private void button1_Click(object sender, EventArgs e)
         {
             // test method
-            tbOutput.AppendText(notifier.SendNotification("Send to targeted users"));
+            tbOutput.AppendText(notifier.SendNotification());
 
         }
 
@@ -206,6 +206,7 @@ namespace WindowsFormsApplication1
                 if (f != null)
                 {
                     Bitmap map = f.CreateBitMapFromSensor();
+                    scene = map;
                     colorImage = map;
                     videoBox.Image = map;
                 }
@@ -364,7 +365,6 @@ namespace WindowsFormsApplication1
                     {
                         // Send message when fall is detected
                         Console.WriteLine(DateTime.Now + ": Fall is detected");
-                        notifier.SendNotification("Send to targeted users");
                         String message = "Fall Detected! Please check messages for more details.";
                         Bitmap copy = new Bitmap(colorImage);
                         messageSender.sendMessageToAllContact(message, copy);

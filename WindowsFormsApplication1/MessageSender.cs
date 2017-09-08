@@ -14,8 +14,8 @@ namespace WindowsFormsApplication1
     /// This class construct and sending messages to the Firebase RT database when an accident occured
     /// </summary>
     class MessageSender
-    {
-
+    {   
+        private string img_name { get; set; }
 
         public async void sendMessageToAllContact(String message, Bitmap imageAccident)
         {
@@ -25,6 +25,7 @@ namespace WindowsFormsApplication1
             string clockID = DateTime.Now.ToString();
             long hashValue = clockID.GetHashCode();
             string fileName = GlobalValues.userID + hashValue.ToString() + ".png";
+
             using (MemoryStream ms = new MemoryStream())
             {
                 imageAccident.Save(fileName, System.Drawing.Imaging.ImageFormat.Png);
@@ -40,8 +41,13 @@ namespace WindowsFormsApplication1
                 //task.Progress.ProgressChanged += (s, e) => Console.WriteLine($"Progress: {e.Percentage} %");
 
                 // Await the task to wait until upload completes and get the download url
-                //var downloadUrl = await task;
+
+                string img_name = await task;
+                
             }
+
+            NotificationSender ns = new NotificationSender();
+            ns.SendNotification(message, fileName);
 
             Message messageToContacts = new Message(message, GlobalValues.user.email, fileName);
 
@@ -141,6 +147,11 @@ namespace WindowsFormsApplication1
             }
 
             return otherContactID;
+        }
+
+        public string getImgUrl()
+        {
+            return img_name;
         }
     }
 }
