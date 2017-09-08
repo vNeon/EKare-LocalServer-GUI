@@ -200,7 +200,7 @@
             this.sendMessageButton.Name = "sendMessageButton";
             this.sendMessageButton.Size = new System.Drawing.Size(134, 40);
             this.sendMessageButton.TabIndex = 17;
-            this.sendMessageButton.Text = "Send notification";
+            this.sendMessageButton.Text = "Send Message";
             this.sendMessageButton.UseVisualStyleBackColor = true;
             this.sendMessageButton.Click += new System.EventHandler(this.sendMessageButton_Click);
             // 

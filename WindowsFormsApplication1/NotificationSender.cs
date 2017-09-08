@@ -80,7 +80,7 @@ namespace WindowsFormsApplication1
             return str;
         }
 
-        public string SendNotification(string message)
+        public string SendNotification(string message, string imgName)
         {
             String str = "no contacts";
 
@@ -88,8 +88,10 @@ namespace WindowsFormsApplication1
             foreach (String key in GlobalValues.contacts.Keys)
             {
                 //String message = textBox1.Text;
-                message = "Fall detected on Monday, May 15, 2017 1:45 PM";//+ DateTime.Now;
-                
+                DateTime thisDay = DateTime.Today;
+                //Console.WriteLine(thisDay.ToString("D"));
+                message = "Fall detected on " + thisDay.ToString("D");//+ DateTime.Now;
+
                 try
                 {
 
@@ -110,7 +112,7 @@ namespace WindowsFormsApplication1
                         {
                             message = message,
                             title = "Fall Detected!",
-                            img_url = "https://firebasestorage.googleapis.com/v0/b/myfirstapplication-5ad99.appspot.com/o/image%2F5s9kRal7NpU2taXF3TeQRplVtPC3-248524188.png?alt=media&token=77a54874-93c7-4042-9f21-d5d26c75408d"
+                            img_name = imgName
                         }
                     };
                     var serializer = new JavaScriptSerializer();
