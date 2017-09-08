@@ -21,6 +21,10 @@ namespace WindowsFormsApplication1
         public double HipX { get; set; }
         public double HipY { get; set; }
         public double HipZ { get; set; }
+        public double floorA { get; set; }
+        public double floorB { get; set; }
+        public double floorC { get; set; }
+        public double floorD { get; set; }
 
         public FrameObject(long ts, double HeadX, double HeadY, double HeadZ,
                             double BoxW, double BoxH, double BoxD,
@@ -40,6 +44,26 @@ namespace WindowsFormsApplication1
             this.HipX = HipX;
             this.HipY = HipY;
             this.HipZ = HipZ;
+        }
+
+        public FrameObject(long ts, double HeadX, double HeadY, double HeadZ,
+                                double SpineX, double SpineY, double SpineZ,
+                                double HipX, double HipY, double HipZ, double floorA, double floorB, double floorC, double floorD)
+        {
+            Timestamp = ts;
+            this.HeadX = HeadX;
+            this.HeadY = HeadY;
+            this.HeadZ = HeadZ;
+            this.SpineX = SpineX;
+            this.SpineY = SpineY;
+            this.SpineZ = SpineZ;
+            this.HipX = HipX;
+            this.HipY = HipY;
+            this.HipZ = HipZ;
+            this.floorA = floorA;
+            this.floorB = floorB;
+            this.floorC = floorC;
+            this.floorD = floorD;
         }
     }
 }

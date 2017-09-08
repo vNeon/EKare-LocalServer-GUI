@@ -35,7 +35,7 @@ namespace WindowsFormsApplication1
         private const float MaxDepthDistanceOffset = MaxDepthDistance - MinDepthDistance;
 
         //SVM Model Object
-        public SVMTest svm;
+        public SupportVectorMachine svm;
         FrameObject prevFrameObject;
 
         static Queue fallMessages = Queue.Synchronized(new Queue());
@@ -49,7 +49,8 @@ namespace WindowsFormsApplication1
         public static Temp _MainFrm;
         private Graphics g = null;
         private Skeleton body;
-
+        private List<FrameObject> frameList = new List<FrameObject>();
+        private static Bitmap colorImage;
         public Temp(String user)
         {
             username = user;
@@ -102,129 +103,85 @@ namespace WindowsFormsApplication1
 
                 if (f != null)
                 {
-                    CreateSkeletonTrackingMap(f);
-                    //var skeletons = new Skeleton[f.SkeletonArrayLength];
-                    //f.CopySkeletonDataTo(skeletons);
-                    //// Find the first person to track
-                    //var trackedPerson = skeletons.FirstOrDefault(s => s.TrackingState == SkeletonTrackingState.Tracked);
+                    var skeletons = new Skeleton[f.SkeletonArrayLength];
+                    f.CopySkeletonDataTo(skeletons);
+                    // Find the first person to track
+                    var trackedPerson = skeletons.FirstOrDefault(s => s.TrackingState == SkeletonTrackingState.Tracked);
 
-                    //if (trackedPerson != null)
-                    //{
-                    //    List<double> data = new List<double>();
+                    if (trackedPerson != null)
+                    {
 
-                    //    float maxY = -1000;
-                    //    float minY = -1000;
-                    //    float maxX = -1000;
-                    //    float minX = -1000;
-                    //    float maxZ = -1000;
-                    //    float minZ = -1000;
+                        if (trackedPerson.TrackingState == SkeletonTrackingState.Tracked)
+                        {
+                            this.body = trackedPerson;
+                            skeletonImage.Refresh();
+                        }
 
-                    //    float boxW = 0;
-                    //    float boxH = 0;
-                    //    float boxD = 0;
+                        frameCounter++;
+                        if (frameCounter == 1 || frameCounter % 15 == 0)
+                        {
+                            List<double> data = new List<double>();
 
-                    //    double headX = trackedPerson.Joints[JointType.Head].Position.X;
-                    //    double headY = trackedPerson.Joints[JointType.Head].Position.Y;
-                    //    double headZ = trackedPerson.Joints[JointType.Head].Position.Z;
+                            double headX = trackedPerson.Joints[JointType.Head].Position.X;
+                            double headY = trackedPerson.Joints[JointType.Head].Position.Y;
+                            double headZ = trackedPerson.Joints[JointType.Head].Position.Z;
 
-                    //    float shoulderCenterX = trackedPerson.Joints[JointType.ShoulderCenter].Position.X;
-                    //    float shoulderCenterY = trackedPerson.Joints[JointType.ShoulderCenter].Position.Y;
-                    //    float shoulderCenterZ = trackedPerson.Joints[JointType.ShoulderCenter].Position.Z;
+                            float hipCenterX = trackedPerson.Joints[JointType.HipCenter].Position.X;
+                            float hipCenterY = trackedPerson.Joints[JointType.HipCenter].Position.Y;
+                            float hipCenterZ = trackedPerson.Joints[JointType.HipCenter].Position.Z;
 
-                    //    Vector3 shoulderCenter = new Vector3(shoulderCenterX, shoulderCenterY, shoulderCenterZ);
+                            Vector3 hipCenter = new Vector3(hipCenterX, hipCenterY, hipCenterZ);
 
-                    //    float hipCenterX = trackedPerson.Joints[JointType.HipCenter].Position.X;
-                    //    float hipCenterY = trackedPerson.Joints[JointType.HipCenter].Position.Y;
-                    //    float hipCenterZ = trackedPerson.Joints[JointType.HipCenter].Position.Z;
+                            float spineX = trackedPerson.Joints[JointType.Spine].Position.X;
+                            float spineY = trackedPerson.Joints[JointType.Spine].Position.Y;
+                            float spineZ = trackedPerson.Joints[JointType.Spine].Position.Z;
 
-                    //    Vector3 hipCenter = new Vector3(hipCenterX, hipCenterY, hipCenterZ);
+                            Vector3 spine = new Vector3(hipCenterX, hipCenterY, hipCenterZ);
 
-                    //    Vector3 spine = shoulderCenter - hipCenter;
-                    //    spine.Normalize();
+                            double floorA = f.FloorClipPlane.Item1;
+                            double floorB = f.FloorClipPlane.Item2;
+                            double floorC = f.FloorClipPlane.Item3;
+                            double floorD = f.FloorClipPlane.Item4;
 
-                    //    foreach (Joint joint in trackedPerson.Joints)
-                    //    {
-                    //        //Console.WriteLine(joint.JointType);
-                    //        // Find the max and min coordiates in the X axis
-                    //        if (maxY == -1000)
-                    //        {
-                    //            maxY = joint.Position.Y;
-                    //            minY = maxY;
-                    //            maxX = joint.Position.X;
-                    //            minX = maxX;
-                    //            maxZ = joint.Position.Z;
-                    //            minZ = maxZ;
-                    //        }
-                    //        else
-                    //        {
-                    //            if (maxX < joint.Position.X)
-                    //            {
-                    //                maxX = joint.Position.X;
-                    //            }
-                    //            if (minX > joint.Position.X)
-                    //            {
-                    //                minX = joint.Position.X;
-                    //            }
-                    //            // Find the max and min cooridates in the Y axis
-                    //            if (maxY < joint.Position.Y)
-                    //            {
-                    //                maxY = joint.Position.Y;
-                    //            }
-                    //            if (minY > joint.Position.Y)
-                    //            {
-                    //                minY = joint.Position.Y;
-                    //            }
-                    //            // Find the max and min cooridates in the Z axis
-                    //            if (maxZ < joint.Position.Z)
-                    //            {
-                    //                maxZ = joint.Position.Z;
-                    //            }
-                    //            if (minZ > joint.Position.Z)
-                    //            {
-                    //                minZ = joint.Position.Z;
-                    //            }
-                    //        }
-                    //    }
+                            // Update previous frame after 0.5 second of not detecting anyone in the area
+                            if (frameList.Count == 3 || (frameList.Count > 0 && (f.Timestamp - frameList.Last().Timestamp) > 1000))
+                            {
+                                frameList.Clear();
+                                frameCounter = 0;
+                                frameList.Add(new FrameObject(f.Timestamp, headX, headY, headZ, spine.X, spine.Y, spine.Z, hipCenterX, hipCenterY, hipCenterZ, floorA, floorB, floorC, floorD));
+                            }
+                            else
+                            {
+                                FrameObject newFrame = new FrameObject(f.Timestamp, headX, headY, headZ, spine.X, spine.Y, spine.Z, hipCenterX, hipCenterY, hipCenterZ, floorA, floorB, floorC, floorD);
+                                frameList.Add(newFrame);
+                                // if classify create object, then change the prevFrame
+                                if (svm == null)
+                                {
+                                    // Change to training data location
+                                    svm = new SupportVectorMachine();
+                                    svm.buildModel();
+                                    //randomForest = new RandomForestEvaluator();
+                                    //randomForest.buildModel();
 
-                    //    boxW = Math.Abs(maxX - minX); // The width of the bounding box 
-                    //    boxH = Math.Abs(maxY - minY); // The height of the bounding box
-                    //    boxD = Math.Abs(maxZ - minZ); // The depth of the bounding box
+                                }
 
-                    //    if (prevFrameObject == null || (f.Timestamp - prevFrameObject.Timestamp) > 1000)
-                    //    {
-                    //        prevFrameObject = new FrameObject(f.Timestamp, headX, headY, headZ, boxW, boxH, boxD, spine.X, spine.Y, spine.Z, hipCenterX, hipCenterY, hipCenterZ);
-                    //        Console.WriteLine((f.Timestamp));
-                    //        Console.WriteLine((prevFrameObject.Timestamp));
-                    //    }
-                    //    else
-                    //    {
-                    //        FrameObject newFrame = new FrameObject(f.Timestamp, headX, headY, headZ, boxW, boxH, boxD, spine.X, spine.Y, spine.Z, hipCenterX, hipCenterY, hipCenterZ);
-                    //        // if classify create object, then change the prevFrame
-                    //        if (svm == null)
-                    //        {
-                    //            // Change to training data location
-                    //            svm = new SVMTest();
-                    //            svm.buildModel();
-                    //        }
-                    //        //run algorithm 
+                                //run algorithm 
+                                if (frameList.Count == 3)
+                                {
 
-                    //        SVMTest threadModel = new SVMTest((Accord.MachineLearning.VectorMachines.SupportVectorMachine<Gaussian>)svm.svmModel.Clone(),
-                    //                                            prevFrameObject,
-                    //                                            newFrame,
-                    //                                            _MainFrm);
-
-                    //        // start thread
-                    //        BackgroundWorker bg = new BackgroundWorker();
-                    //        bg.DoWork += new DoWorkEventHandler(bg_DoWork);
-                    //        bg.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bg_RunWorkerCompleted);
-                    //        bg.RunWorkerAsync(threadModel);
-
-                    //        //Thread threadClassify = new Thread(new ThreadStart(threadModel.classify));
-                    //        //threadClassify.Start();
-
-                    //        prevFrameObject = newFrame;
-                    //    }
-                    //}
+                                    SupportVectorMachine threadModel = new SupportVectorMachine((Accord.MachineLearning.VectorMachines.SupportVectorMachine<Gaussian>)svm.svmModel.Clone(),
+                                                                        frameList);
+                                    //RandomForest forestClone = randomForest.forest.CloneJson<RandomForest>();
+                                    //RandomForestEvaluator threadModel = new RandomForestEvaluator(forestClone, frameList);
+                                    // start thread
+                                    BackgroundWorker bg = new BackgroundWorker();
+                                    bg.DoWork += new DoWorkEventHandler(bg_DoWork);
+                                    bg.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bg_RunWorkerCompleted);
+                                    bg.RunWorkerAsync(threadModel);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -249,30 +206,10 @@ namespace WindowsFormsApplication1
                 if (f != null)
                 {
                     Bitmap map = f.CreateBitMapFromSensor();
-                    scene = map;
+                    colorImage = map;
                     videoBox.Image = map;
                 }
             }
-        }
-
-        private void CreateSkeletonTrackingMap(SkeletonFrame f)
-        {
-            //list of skeletons
-            var skeletons = new Skeleton[f.SkeletonArrayLength];
-            f.CopySkeletonDataTo(skeletons);
-
-            //Find the first person to track
-            Skeleton trackedPerson = skeletons.FirstOrDefault(s => s.TrackingState == SkeletonTrackingState.Tracked);
-
-            if (trackedPerson != null)
-            {
-                if (trackedPerson.TrackingState == SkeletonTrackingState.Tracked)
-                {
-                    this.body = trackedPerson;
-                    skeletonImage.Refresh();
-                }
-            }
-
         }
 
         private void KinectSensors_StatusChanged(object sender, StatusChangedEventArgs e)
@@ -364,7 +301,7 @@ namespace WindowsFormsApplication1
                 kinect.SkeletonFrameReady -= Kinect_SkeletonFrameReady;
                 body = null;
                 skeletonBtn.Text = "Skeleton ON";
-                skeletonImage.BackColor = System.Drawing.Color.White;
+                skeletonImage.BackColor = SystemColors.Control;
                 this.Update();
             }
         }
@@ -379,7 +316,10 @@ namespace WindowsFormsApplication1
             g = skeletonImage.CreateGraphics();
             if (body != null)
             {
-                skeletonImage.DrawSkeleton(body, g);
+                //skeletonImage.DrawSkeleton(body, g);
+                BackgroundWorker worker = new BackgroundWorker();
+                worker.DoWork += new DoWorkEventHandler(updateUIWorker_DoWork);
+                worker.RunWorkerAsync(this.g);
             }
         }
 
@@ -394,7 +334,7 @@ namespace WindowsFormsApplication1
         #region classify worker
         static void bg_DoWork(object sender, DoWorkEventArgs e)
         {
-            SVMTest threadObj = e.Argument as SVMTest;
+            SupportVectorMachine threadObj = e.Argument as SupportVectorMachine;
             bool result = threadObj.classify();
             fallMessages.Enqueue(result);
         }
@@ -410,21 +350,24 @@ namespace WindowsFormsApplication1
                 {
                     for (int i = 0; i < windowSize; i++)
                     {
-                        if ((bool)fallMessages.Dequeue())
+                        bool fall = (bool)fallMessages.Dequeue();
+                        Console.WriteLine("-----------");
+                        Console.WriteLine(fall);
+                        if (fall)
                         {
                             count++;
                         }
                     }
+                    Console.WriteLine(count);
 
-                    if (count == windowSize)
+                    if (count >= 3)
                     {
-                        _MainFrm.AppendToBox("Fall Detected!");
-
-                        // Add code here to send notification and messages
-                        _MainFrm.AppendToBox(notifier.SendNotification("Send to targeted users"));
-
+                        // Send message when fall is detected
+                        Console.WriteLine(DateTime.Now + ": Fall is detected");
+                        notifier.SendNotification("Send to targeted users");
                         String message = "Fall Detected! Please check messages for more details.";
-                        messageSender.sendMessageToAllContact(message, _MainFrm.scene);
+                        Bitmap copy = new Bitmap(colorImage);
+                        messageSender.sendMessageToAllContact(message, copy);
                     }
                 }
             }
@@ -435,7 +378,8 @@ namespace WindowsFormsApplication1
         #region update ui worker
         private void updateUIWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            
+            Graphics g = e.Argument as Graphics;
+            g.DrawSkeleton(body, skeletonImage.Width, skeletonImage.Height);
         }
         #endregion
     }

@@ -152,64 +152,53 @@ namespace WindowsFormsApplication1
 
         #region Draw
 
-        public static void DrawSkeleton(this Panel canvas, Skeleton skeleton, Graphics g)
+        public static void DrawSkeleton(this Graphics g, Skeleton skeleton,int width, int height)
         {
-            canvas.Refresh();
             if (skeleton == null) return;
 
             foreach (Joint joint in skeleton.Joints)
             {
-                canvas.DrawPoint(joint,g);
+                g.DrawPoint(joint, width, height);
             }
 
-            canvas.DrawLine(skeleton.Joints[JointType.Head], skeleton.Joints[JointType.ShoulderCenter], g);
-            canvas.DrawLine(skeleton.Joints[JointType.ShoulderCenter], skeleton.Joints[JointType.ShoulderRight], g);
-            canvas.DrawLine(skeleton.Joints[JointType.ShoulderCenter], skeleton.Joints[JointType.ShoulderLeft], g);
-            canvas.DrawLine(skeleton.Joints[JointType.ShoulderCenter], skeleton.Joints[JointType.Spine], g);
-            canvas.DrawLine(skeleton.Joints[JointType.ShoulderLeft], skeleton.Joints[JointType.ElbowLeft], g);
-            canvas.DrawLine(skeleton.Joints[JointType.ShoulderRight], skeleton.Joints[JointType.ElbowRight], g);
-            canvas.DrawLine(skeleton.Joints[JointType.ElbowLeft], skeleton.Joints[JointType.WristLeft], g);
-            canvas.DrawLine(skeleton.Joints[JointType.ElbowRight], skeleton.Joints[JointType.WristRight], g);
-            canvas.DrawLine(skeleton.Joints[JointType.WristLeft], skeleton.Joints[JointType.HandLeft], g);
-            canvas.DrawLine(skeleton.Joints[JointType.WristRight], skeleton.Joints[JointType.HandRight], g);
-            canvas.DrawLine(skeleton.Joints[JointType.Spine], skeleton.Joints[JointType.HipCenter], g);
-            canvas.DrawLine(skeleton.Joints[JointType.HipCenter], skeleton.Joints[JointType.HipLeft], g);
-            canvas.DrawLine(skeleton.Joints[JointType.HipCenter], skeleton.Joints[JointType.HipRight], g);
-            canvas.DrawLine(skeleton.Joints[JointType.HipLeft], skeleton.Joints[JointType.KneeLeft], g);
-            canvas.DrawLine(skeleton.Joints[JointType.HipRight], skeleton.Joints[JointType.KneeRight], g);
-            canvas.DrawLine(skeleton.Joints[JointType.KneeLeft], skeleton.Joints[JointType.AnkleLeft], g);
-            canvas.DrawLine(skeleton.Joints[JointType.KneeRight], skeleton.Joints[JointType.AnkleRight], g);
-            canvas.DrawLine(skeleton.Joints[JointType.AnkleLeft], skeleton.Joints[JointType.FootLeft], g);
-            canvas.DrawLine(skeleton.Joints[JointType.AnkleRight], skeleton.Joints[JointType.FootRight], g);
+            g.DrawLine(skeleton.Joints[JointType.Head], skeleton.Joints[JointType.ShoulderCenter], width,height);
+            g.DrawLine(skeleton.Joints[JointType.ShoulderCenter], skeleton.Joints[JointType.ShoulderRight], width, height);
+            g.DrawLine(skeleton.Joints[JointType.ShoulderCenter], skeleton.Joints[JointType.ShoulderLeft], width, height);
+            g.DrawLine(skeleton.Joints[JointType.ShoulderCenter], skeleton.Joints[JointType.Spine], width, height);
+            g.DrawLine(skeleton.Joints[JointType.ShoulderLeft], skeleton.Joints[JointType.ElbowLeft], width, height);
+            g.DrawLine(skeleton.Joints[JointType.ShoulderRight], skeleton.Joints[JointType.ElbowRight], width, height);
+            g.DrawLine(skeleton.Joints[JointType.ElbowLeft], skeleton.Joints[JointType.WristLeft], width, height);
+            g.DrawLine(skeleton.Joints[JointType.ElbowRight], skeleton.Joints[JointType.WristRight], width, height);
+            g.DrawLine(skeleton.Joints[JointType.WristLeft], skeleton.Joints[JointType.HandLeft], width, height);
+            g.DrawLine(skeleton.Joints[JointType.WristRight], skeleton.Joints[JointType.HandRight],width, height);
+            g.DrawLine(skeleton.Joints[JointType.Spine], skeleton.Joints[JointType.HipCenter], width, height);
+            g.DrawLine(skeleton.Joints[JointType.HipCenter], skeleton.Joints[JointType.HipLeft], width, height);
+            g.DrawLine(skeleton.Joints[JointType.HipCenter], skeleton.Joints[JointType.HipRight], width, height);
+            g.DrawLine(skeleton.Joints[JointType.HipLeft], skeleton.Joints[JointType.KneeLeft], width, height);
+            g.DrawLine(skeleton.Joints[JointType.HipRight], skeleton.Joints[JointType.KneeRight], width, height);
+            g.DrawLine(skeleton.Joints[JointType.KneeLeft], skeleton.Joints[JointType.AnkleLeft], width, height);
+            g.DrawLine(skeleton.Joints[JointType.KneeRight], skeleton.Joints[JointType.AnkleRight], width, height);
+            g.DrawLine(skeleton.Joints[JointType.AnkleLeft], skeleton.Joints[JointType.FootLeft], width, height);
+            g.DrawLine(skeleton.Joints[JointType.AnkleRight], skeleton.Joints[JointType.FootRight], width, height);
         }
 
-        public static void DrawPoint(this Panel canvas, Joint joint, Graphics g)
+        public static void DrawPoint(this Graphics g, Joint joint, int width, int height)
         {
             if (joint.TrackingState == JointTrackingState.NotTracked) return;
 
-            joint = joint.ScaleTo(canvas.Width, canvas.Height);
+            joint = joint.ScaleTo(width, height);
 
             g.DrawEllipse(Pens.CadetBlue, joint.Position.X, joint.Position.Y, 5, 5);
         }
 
-        public static void DrawLine(this Panel canvas, Joint first, Joint second,Graphics g)
+        public static void DrawLine(this Graphics g, Joint first, Joint second,int width, int height)
         {
             if (first.TrackingState == JointTrackingState.NotTracked || second.TrackingState == JointTrackingState.NotTracked) return;
 
-            first = first.ScaleTo(canvas.Width, canvas.Height);
-            second = second.ScaleTo(canvas.Width, canvas.Height);
-
-            //Line line = new Line
-            //{
-            //    X1 = first.Position.X,
-            //    Y1 = first.Position.Y,
-            //    X2 = second.Position.X,
-            //    Y2 = second.Position.Y,
-            //    StrokeThickness = 8,
-            //    Stroke = new SolidColorBrush(Colors.LightBlue)
-            //};
-
-            g.DrawLine(Pens.CadetBlue,first.Position.X,first.Position.Y, second.Position.X,second.Position.Y);
+            first = first.ScaleTo(width, height);
+            second = second.ScaleTo(width, height);
+            System.Drawing.Pen bluePen = new System.Drawing.Pen(System.Drawing.Color.CadetBlue, 3);
+            g.DrawLine(bluePen, first.Position.X,first.Position.Y, second.Position.X,second.Position.Y);
 
         }
         #endregion
