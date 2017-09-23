@@ -26,6 +26,6 @@ If this does not work you will need to create an account using the Android appli
 
 ### GUI Buttons
 
-Color ON/OFF - toggles the RGB colour sensor of the Kinect.Shows color image.
-Depth ON/OFF - toggles the Depth sensor of the Kinect. Shows depth image.
-Skeleton ON/.OFF- toggles the Fall detection algorithm. Shows the skeletal tracking.
+* Color ON/OFF - toggles the RGB colour sensor of the Kinect.Shows color image.
+* Depth ON/OFF - toggles the Depth sensor of the Kinect. Shows depth image.
+* Skeleton ON/.OFF- toggles the Fall detection algorithm. Shows the skeletal tracking.
