@@ -29,18 +29,18 @@ This is implementated as a windowsform application.
   
     * Or download the zip file from https://github.com/vNeon/EKare-LocalServer-GUI.git
   
-3. Open the project using Visual studio
+2. Open the project using Visual studio
     * Navigate to the GitHub project and double click on the file "WindowsFormsApplication1.sln".
 The file "WindowsFormsApplication1.sln" should be in the same directory as this README.md file.
 
-4. Plugin your Kinect device.
+3. Plugin your Kinect device.
 
-5. Run the application by clicking "start".
+4. Run the application by clicking "start".
 
 ## GUI Buttons
 
 1. Color ON/OFF 
-    * toggles the RGB colour sensor of the Kinect.Shows color image.
+    * toggles the RGB colour sensor of the Kinect. Shows color image.
     
 2. Depth ON/OFF 
     * toggles the Depth sensor of the Kinect. Shows depth image.
