@@ -5,6 +5,7 @@ using System.Data;
 using System.IO;
 using Accord.Math;
 using Accord.Math.Optimization.Losses;
+using System.Collections.Generic;
 
 namespace WindowsFormsApplication1
 {
@@ -67,57 +68,6 @@ namespace WindowsFormsApplication1
             // Convert the DataTable to input and output vectors
             this.inputs = table.ToJagged<double>("HeadDist_1", "Head_Vel_1", "HipCenterDist_1", "HipCenter_Vel_1", "SpineDist_1", "Spine_Vel_1", "HeadDist_2", "Head_Vel_2", "HipCenterDist_2", "HipCenter_Vel_2", "SpineDist_2", "Spine_Vel_2");
             this.outputs = table.Columns["Class"].ToArray<int>();
-
-            //StreamReader oStreamReader = new StreamReader(this.filePath);
-            //int rowCount = 0;
-            //string[] columnNames = null;
-            //string[] featureVector = null;
-            //while (!oStreamReader.EndOfStream)
-            //{
-            //    String row = oStreamReader.ReadLine().Trim();
-
-            //    if (row.Length > 0)
-            //    {
-            //        featureVector = row.Split(',');
-            //        if (rowCount == 0)
-            //        {
-            //            columnNames = featureVector;
-            //            foreach (string columnHeader in columnNames)
-            //            {
-            //                DataColumn column = new DataColumn(columnHeader.ToUpper(), typeof(string));
-            //                column.DefaultValue = (float)0;
-            //                trainingData.Columns.Add(column);
-            //            }
-            //        }
-            //        else
-            //        {
-            //            DataRow tableRow = trainingData.NewRow();
-            //            for (int i = 0; i < columnNames.Length; i++)
-            //            {
-            //                if (featureVector[i] == null)
-            //                {
-            //                    tableRow[columnNames[i]] = 0;
-            //                }
-            //                else
-            //                {
-            //                    tableRow[columnNames[i]] = featureVector[i];
-            //                }
-            //            }
-            //            trainingData.Rows.Add(tableRow);
-
-            //        }
-            //    }
-            //    rowCount++;
-            //}
-            //oStreamReader.Close();
-            //oStreamReader.Dispose();
-
-            //// TODO NEED TO CHANGE TO NUMBER OF FEATURES
-            //string[] features = new string[67];
-            //Array.Copy(columnNames, 0, features, 0, 67);
-
-            //this.inputs = trainingData.ToJagged<double>(features);
-            //this.outputs = trainingData.Columns["Class"].ToArray<int>();
         }
         
         // Learn model
