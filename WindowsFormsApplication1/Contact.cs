@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 namespace WindowsFormsApplication1
 {
+    /**
+     * Class Contact:
+     * It is the Data Transmittion object for contacts
+     * This object is serialized to a Json document and posted to Firebase database
+     */
     class Contact
     {
         [JsonProperty("email")]
