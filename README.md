@@ -22,20 +22,6 @@ This is implementated as a windowsform application.
 * .NET
 * Kinect for [Windows SDK v1.8](https://www.microsoft.com/en-nz/download/details.aspx?id=40278).
 
-## How to run
-
-1. Download the GitHub project into a folder.
-2. Download [visual studio's 2015](https://www.visualstudio.com/) or higher.
-3. Download 
-4. Open visual studio's
-5. Click "File" -> "Open" -> "Project/Solution..." or shortcut "Ctrl + Shift + O"
-6. Navigate to the GitHub project and double click on the file "WindowsFormsApplication1.sln".
-The file "WindowsFormsApplication1.sln" should be in the same directory as this README.md file.
-7. Plugin your Kinect device.
-8. Click the Start button to run the application.
-9. It will ask for a email and password. It should already be entered so just click the Login Button. 
-If this does not work you will need to create an account using the Android application.
-
 ## Installation - Run
 1. Clone/Download the project from github using the command:
 
@@ -51,7 +37,7 @@ The file "WindowsFormsApplication1.sln" should be in the same directory as this 
 
 5. Run the application by clicking "start".
 
-### GUI Buttons
+## GUI Buttons
 
 1. Color ON/OFF 
     * toggles the RGB colour sensor of the Kinect.Shows color image.
