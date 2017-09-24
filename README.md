@@ -1,20 +1,32 @@
-# WFA-SendMessageToApp
+# EKare Local Server with GUI
 
-This GitHub project contains a GUI version of the windows service.
+This is the local server with a graphical user interface. The GUI allowed for easier debugging and developement, and then later ported to a windows service. 
 
 It is responsible for:
-1. Collecting Skeletal tracking frames from the Microsoft Kinect.
-2. Fall Detection, by running a machine learning algorithm.
-3. Notifying a cloud serivce that a fall has occured.
+* Collecting Skeletal tracking frames from the Microsoft Kinect.
+* Fall Detection, by running a machine learning algorithm.
+* Notifying a cloud serivce that a fall has occured.
 
 This is implementated as a windowsform application.
 
+## Authors: 
+
+### Johnny Pham 
+* UPI: dpha010
+* GithubID: JohPa8696
+### Vincent Nio
+* UPI: vnio666
+* GithubID: vNeon
+
+## Prerequisites
+* .NET
+* Kinect for [Windows SDK v1.8](https://www.microsoft.com/en-nz/download/details.aspx?id=40278).
 
 ## How to run
 
 1. Download the GitHub project into a folder.
 2. Download [visual studio's 2015](https://www.visualstudio.com/) or higher.
-3. Download Kinect for [Windows SDK v1.8](https://www.microsoft.com/en-nz/download/details.aspx?id=40278).
+3. Download 
 4. Open visual studio's
 5. Click "File" -> "Open" -> "Project/Solution..." or shortcut "Ctrl + Shift + O"
 6. Navigate to the GitHub project and double click on the file "WindowsFormsApplication1.sln".
@@ -24,10 +36,34 @@ The file "WindowsFormsApplication1.sln" should be in the same directory as this 
 9. It will ask for a email and password. It should already be entered so just click the Login Button. 
 If this does not work you will need to create an account using the Android application.
 
+## Installation - Run
+1. Clone/Download the project from github using the command:
+
+    * git clone https://github.com/vNeon/EKare-LocalServer-GUI.git
+  
+    * Or download the zip file from https://github.com/vNeon/EKare-LocalServer-GUI.git
+  
+3. Open the project using Visual studio
+    * Navigate to the GitHub project and double click on the file "WindowsFormsApplication1.sln".
+The file "WindowsFormsApplication1.sln" should be in the same directory as this README.md file.
+
+4. Plugin your Kinect device.
+
+5. Run the application by clicking "start".
+
 ### GUI Buttons
 
-* Color ON/OFF - toggles the RGB colour sensor of the Kinect.Shows color image.
-* Depth ON/OFF - toggles the Depth sensor of the Kinect. Shows depth image.
-* Skeleton ON/.OFF- toggles the Fall detection algorithm. Shows the skeletal tracking.
-* Send Notifiaction - sends Push notification to android users.
-* Send Message - sends message to android users.
+1. Color ON/OFF 
+    * toggles the RGB colour sensor of the Kinect.Shows color image.
+    
+2. Depth ON/OFF 
+    * toggles the Depth sensor of the Kinect. Shows depth image.
+    
+3. Skeleton ON/OFF
+    * toggles the Fall detection algorithm. Shows the skeletal tracking.
+    
+4. Send Notifiaction 
+    * sends Push notification to android users.
+    
+5. Send Message 
+    * sends message to android users.
