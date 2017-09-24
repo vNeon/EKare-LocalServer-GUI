@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WindowsFormsApplication1
+﻿namespace WindowsFormsApplication1
 {
+    /**
+     * Class FrameObject
+     * This class store the skeletal tracking frames of the Kinect
+     * The skeletal frames are temporary and get discarded, this class
+     * was created to store them for a longer time frame.
+     */
     public class FrameObject
     {
         public long Timestamp { get; set; }

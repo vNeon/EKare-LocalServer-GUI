@@ -1,19 +1,18 @@
 ﻿using Microsoft.Kinect;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace WindowsFormsApplication1
 {
+    /**
+     * Class DrawExtensions
+     * This class draws using the infomation obtained from the Kinect sensors
+     * Draws RGB, Depth and skeletaltraking images.
+     */
     public static class DrawExtensions
     {
 

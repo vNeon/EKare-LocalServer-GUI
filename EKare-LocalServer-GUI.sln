@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApplication1", "WindowsFormsApplication1\WindowsFormsApplication1.csproj", "{30C9C82D-F69B-48B6-A92C-C2EF7BC15A9A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EKare-LocalServer-GUI", "WindowsFormsApplication1\EKare-LocalServer-GUI.csproj", "{30C9C82D-F69B-48B6-A92C-C2EF7BC15A9A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

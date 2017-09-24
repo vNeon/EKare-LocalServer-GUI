@@ -1,13 +1,8 @@
 ﻿using System;
-using Accord.Controls;
-using Accord.IO;
 using Accord.Math;
 using Accord.Statistics;
 using Accord.MachineLearning.VectorMachines.Learning;
 using System.Data;
-using System.Collections;
-using System.Data.OleDb;
-using System.Windows.Forms;
 using System.IO;
 using Accord.Statistics.Kernels;
 using System.Collections.Generic;
@@ -15,6 +10,10 @@ using WindowsFormsApplication1;
 
 public class SupportVectorMachine
 {
+    /**
+     * Class SupportVectorMachine:
+     * Fall Detection Algorithm using SVM to classify whether a fall has occured
+     */
     public string fileLocation;
     public Accord.MachineLearning.VectorMachines.SupportVectorMachine<Gaussian> svmModel { get; set; }
     public double[][] inputs;
@@ -26,7 +25,6 @@ public class SupportVectorMachine
     {
         // Read the Excel worksheet into a DataTable
         fileLocation = Directory.GetCurrentDirectory() + "\\Resources\\Book1.xlsx";
-        //fileLocation = "C:\\Users\\johnn\\Documents\\Visual Studio 2015\\Projects\\FallDetectionService\\FallDetectionService\\Resources\\Book1.xlsx";
         DataTable table = new Accord.IO.ExcelReader(fileLocation).GetWorksheet("Sheet4");
 
         // Convert the DataTable to input and output vectors
@@ -37,8 +35,6 @@ public class SupportVectorMachine
     public SupportVectorMachine(string fileLocation)
     {
         // Read the Excel worksheet into a DataTable    
-        //DataTable table = new ExcelReader(fileLocation).GetWorksheet("Sheet1");
-
         StreamReader oStreamReader = new StreamReader(fileLocation);
         DataTable table = new DataTable();
         int rowCount = 0;

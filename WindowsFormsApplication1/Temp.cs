@@ -24,6 +24,17 @@ using Accord.MachineLearning.DecisionTrees;
 
 namespace WindowsFormsApplication1
 {
+    /**
+     * Class Temp:
+     * Main user interface for the local server
+     * 
+     * Shows:
+     * RGB video stream,
+     * Depth sensor stream,
+     * skeletal tracking stream,
+     * sends messages,
+     * sends notifications.
+     */ 
     public partial class Temp : Form
     {
         static private NotificationSender notifier = new NotificationSender();

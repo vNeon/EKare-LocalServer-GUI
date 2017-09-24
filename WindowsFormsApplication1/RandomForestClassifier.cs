@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Accord.MachineLearning.DecisionTrees;
-using Accord.Math.Random;
 using System.Data;
 using System.IO;
 using Accord.Math;
@@ -12,6 +8,10 @@ using Accord.Math.Optimization.Losses;
 
 namespace WindowsFormsApplication1
 {
+    /**
+     * Class RandomForestClassifier:
+     * Fall Detection Algorithm using randomforest to classify whether a fall has occured
+     */
     class RandomForestClassifier
     {
         public double[][] inputs { get; set; }
