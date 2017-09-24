@@ -122,9 +122,6 @@ public class SupportVectorMachine
         {
             bool[] answers = svmModel.Decide(inputs);
             zeroOneAnswers = answers.ToZeroOne();
-
-            //ScatterplotBox.Show("Expected results", inputs, outputs);
-            //ScatterplotBox.Show("LinearSVM results", inputs, zeroOneAnswers);
         }
 
         return zeroOneAnswers[0];
