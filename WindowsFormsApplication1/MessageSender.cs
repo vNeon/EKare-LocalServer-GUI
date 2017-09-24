@@ -121,7 +121,6 @@ namespace WindowsFormsApplication1
                                                                     + "/" + GlobalValues.userID + "/contacts.json" + "?auth=" + GlobalValues.dbSecret, httpMethod.GET);
             contactsRequest.makeRequest();
             String res = contactsRequest.executeGetRequest();
-            //Console.WriteLine(res);
             if (res != null && res != "")
             {
                 Dictionary<String, Contact> jsonTemp = JsonConvert.DeserializeObject<Dictionary<String, Contact>>(res);

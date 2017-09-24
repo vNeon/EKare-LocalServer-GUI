@@ -23,14 +23,10 @@ namespace WindowsFormsApplication1
             { 
 
                 string senderId = "843754650351";
-
-                //string deviceId = "ch_G60NPga4:APA9............T_LH8up40Ghi-J";
-
                 WebRequest tRequest = WebRequest.Create("https://fcm.googleapis.com/fcm/send");
                 tRequest.Method = "post";
                 tRequest.ContentType = "application/json";
 
-                //to = "/topics/all",
                 string s6 = "cI5LMmD20So:APA91bFVkSZLrqYDiicul7_VPPeNHQZ-cl4DlbIWbpzwq9_fZ-8l3OOWDjgFMfR1R0os1NgMnZizEdMczAUmZgiqCHqTgG_aSxHAG8Izv0ybcgQqa2SiHY6L39gPTxJV2zNIYIT2Pj5l";
                 string em = "fmdMKGiiYWU:APA91bE5HG7c_QtSx88DmC8g-KcKZgQO77N-xvzOq3MmkpZoUUnH_5k9OVEMl808OYlDl8BCbBr2PVun7FMYe-Zr6ZNTWNJvFsKckZOHLSMsFRbgZJdRekvjt0MYlMGkuBdNwwTo5CyW";
 
@@ -94,15 +90,9 @@ namespace WindowsFormsApplication1
                 {
 
                     string senderId = "843754650351";
-
-                    //string deviceId = "ch_G60NPga4:APA9............T_LH8up40Ghi-J";
-
                     WebRequest tRequest = WebRequest.Create("https://fcm.googleapis.com/fcm/send");
                     tRequest.Method = "post";
                     tRequest.ContentType = "application/json";
-
-                    //to = "/topics/all",
-
                     var notification = new
                     {
                         to = GlobalValues.contacts[key].deviceToken,

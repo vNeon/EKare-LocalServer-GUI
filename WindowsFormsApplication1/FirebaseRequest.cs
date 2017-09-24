@@ -23,7 +23,6 @@ namespace WindowsFormsApplication1
     /*
      * This class create and execute the requests to the realtime Firebase database. 
      * The responses are handdled here and return the the main fall message sender class.
-     * 
      */ 
 
     /// <summary>
