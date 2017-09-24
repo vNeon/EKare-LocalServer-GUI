@@ -20,6 +20,7 @@ using System.Collections;
 using Accord.Math;
 using Accord.Statistics.Kernels;
 using System.Windows.Controls;
+using Accord.MachineLearning.DecisionTrees;
 
 namespace WindowsFormsApplication1
 {
@@ -46,7 +47,8 @@ namespace WindowsFormsApplication1
         private const float MaxDepthDistanceOffset = MaxDepthDistance - MinDepthDistance;
 
         //SVM Model Object
-        public SupportVectorMachine svm;
+        private SupportVectorMachine svm;
+        private RandomForestClassifier randomForest;
         FrameObject prevFrameObject;
 
         static Queue fallMessages = Queue.Synchronized(new Queue());
@@ -114,9 +116,20 @@ namespace WindowsFormsApplication1
 
                 if (f != null)
                 {
-                    var skeletons = new Skeleton[f.SkeletonArrayLength];
+                    Skeleton[] skeletons = new Skeleton[f.SkeletonArrayLength];
                     f.CopySkeletonDataTo(skeletons);
                     // Find the first person to track
+                    noPeoplelbl.Text = skeletons.Length.ToString();
+                    int count = 0;
+                    foreach(Skeleton s in skeletons)
+                    {
+                        if(s.TrackingState == SkeletonTrackingState.Tracked)
+                        {
+                            count++;
+                        }
+                    }
+
+                    noPeoplelbl.Text = count.ToString();
                     var trackedPerson = skeletons.FirstOrDefault(s => s.TrackingState == SkeletonTrackingState.Tracked);
 
                     if (trackedPerson != null)
@@ -171,7 +184,7 @@ namespace WindowsFormsApplication1
                                     // Change to training data location
                                     svm = new SupportVectorMachine();
                                     svm.buildModel();
-                                    //randomForest = new RandomForestEvaluator();
+                                    //randomForest = new RandomForestClassifier();
                                     //randomForest.buildModel();
 
                                 }
@@ -182,8 +195,11 @@ namespace WindowsFormsApplication1
 
                                     SupportVectorMachine threadModel = new SupportVectorMachine((Accord.MachineLearning.VectorMachines.SupportVectorMachine<Gaussian>)svm.svmModel.Clone(),
                                                                         frameList);
-                                    //RandomForest forestClone = randomForest.forest.CloneJson<RandomForest>();
-                                    //RandomForestEvaluator threadModel = new RandomForestEvaluator(forestClone, frameList);
+                                    //RandomForest forestClone = randomForest.forest.CloneJson();
+                                    //RandomForestClassifier forestWrapper = new RandomForestClassifier(forestClone,frameList);
+                                    //forestWrapper.inputs = randomForest.inputs;
+                                    //forestWrapper.outputs = randomForest.outputs;
+                                    //forestWrapper.frameList = this.frameList;
                                     // start thread
                                     BackgroundWorker bg = new BackgroundWorker();
                                     bg.DoWork += new DoWorkEventHandler(bg_DoWork);
@@ -346,14 +362,25 @@ namespace WindowsFormsApplication1
         #region classify worker
         static void bg_DoWork(object sender, DoWorkEventArgs e)
         {
-            SupportVectorMachine threadObj = e.Argument as SupportVectorMachine;
-            bool result = threadObj.classify();
+            bool result = false;
+            if (e.Argument.GetType().ToString().Equals("SupportVectorMachine"))
+            {
+                SupportVectorMachine svm = e.Argument as SupportVectorMachine;
+                result = svm.classify();
+            }
+            //else
+            //{
+            //    RandomForestClassifier forestWrapper = e.Argument as RandomForestClassifier;
+            //    forestWrapper.learnData();
+            //    result = forestWrapper.classify()==1 ?true:false;
+
+            //}
             fallMessages.Enqueue(result);
         }
 
         static void bg_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            int windowSize = 5;
+            int windowSize = 1;
             int count = 0;
 
             lock (fallMessages)
@@ -372,11 +399,11 @@ namespace WindowsFormsApplication1
                     }
                     Console.WriteLine(count);
 
-                    if (count >= 3)
+                    if (count >= 1)
                     {
                         // Send message when fall is detected
                         Console.WriteLine(DateTime.Now + ": Fall is detected");
-                        String message = "Fall Detected! Please check messages for more details.";
+                        String message = " has fallen. Please take necessary action!";
                         Bitmap copy = new Bitmap(colorImage);
                         messageSender.sendMessageToAllContact(message, copy);
                     }
@@ -392,9 +419,13 @@ namespace WindowsFormsApplication1
             Graphics g = e.Argument as Graphics;
             g.DrawSkeleton(body, skeletonImage.Width, skeletonImage.Height);
         }
+
         #endregion
 
+        private void label7_Click(object sender, EventArgs e)
+        {
 
+        }
     }
 }
 

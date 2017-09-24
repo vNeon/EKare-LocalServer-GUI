@@ -30,7 +30,6 @@
         {
             this.videoBox = new System.Windows.Forms.PictureBox();
             this.depthImage = new System.Windows.Forms.PictureBox();
-            this.graphImage = new System.Windows.Forms.PictureBox();
             this.skeletonImage = new System.Windows.Forms.Panel();
             this.colorBtn = new System.Windows.Forms.Button();
             this.depthBtn = new System.Windows.Forms.Button();
@@ -55,9 +54,10 @@
             this.kinectInfoGb = new System.Windows.Forms.GroupBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.noPeoplelbl = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.videoBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.depthImage)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.graphImage)).BeginInit();
             this.controlButtonGb.SuspendLayout();
             this.testToolsGb.SuspendLayout();
             this.kinectInfoGb.SuspendLayout();
@@ -73,19 +73,11 @@
             // 
             // depthImage
             // 
-            this.depthImage.Location = new System.Drawing.Point(13, 478);
+            this.depthImage.Location = new System.Drawing.Point(368, 469);
             this.depthImage.Name = "depthImage";
             this.depthImage.Size = new System.Drawing.Size(675, 450);
             this.depthImage.TabIndex = 2;
             this.depthImage.TabStop = false;
-            // 
-            // graphImage
-            // 
-            this.graphImage.Location = new System.Drawing.Point(717, 478);
-            this.graphImage.Name = "graphImage";
-            this.graphImage.Size = new System.Drawing.Size(675, 450);
-            this.graphImage.TabIndex = 3;
-            this.graphImage.TabStop = false;
             // 
             // skeletonImage
             // 
@@ -306,6 +298,8 @@
             // 
             // kinectInfoGb
             // 
+            this.kinectInfoGb.Controls.Add(this.noPeoplelbl);
+            this.kinectInfoGb.Controls.Add(this.label7);
             this.kinectInfoGb.Controls.Add(this.label3);
             this.kinectInfoGb.Controls.Add(this.label2);
             this.kinectInfoGb.Controls.Add(this.lblStatus);
@@ -338,6 +332,27 @@
             this.label2.TabIndex = 13;
             this.label2.Text = "Status:";
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.Location = new System.Drawing.Point(6, 140);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(165, 20);
+            this.label7.TabIndex = 15;
+            this.label7.Text = "No . tracked People: ";
+            this.label7.Click += new System.EventHandler(this.label7_Click);
+            // 
+            // noPeoplelbl
+            // 
+            this.noPeoplelbl.AutoSize = true;
+            this.noPeoplelbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.noPeoplelbl.Location = new System.Drawing.Point(257, 140);
+            this.noPeoplelbl.Name = "noPeoplelbl";
+            this.noPeoplelbl.Size = new System.Drawing.Size(16, 17);
+            this.noPeoplelbl.TabIndex = 16;
+            this.noPeoplelbl.Text = "0";
+            // 
             // Temp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -349,7 +364,6 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.tbOutput);
             this.Controls.Add(this.skeletonImage);
-            this.Controls.Add(this.graphImage);
             this.Controls.Add(this.depthImage);
             this.Controls.Add(this.videoBox);
             this.Name = "Temp";
@@ -357,7 +371,6 @@
             this.Load += new System.EventHandler(this.Temp_Load);
             ((System.ComponentModel.ISupportInitialize)(this.videoBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.depthImage)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.graphImage)).EndInit();
             this.controlButtonGb.ResumeLayout(false);
             this.testToolsGb.ResumeLayout(false);
             this.testToolsGb.PerformLayout();
@@ -372,7 +385,6 @@
 
         private System.Windows.Forms.PictureBox videoBox;
         private System.Windows.Forms.PictureBox depthImage;
-        private System.Windows.Forms.PictureBox graphImage;
         private System.Windows.Forms.Panel skeletonImage;
         private System.Windows.Forms.Button colorBtn;
         private System.Windows.Forms.Button depthBtn;
@@ -397,5 +409,7 @@
         private System.Windows.Forms.GroupBox kinectInfoGb;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label noPeoplelbl;
     }
 }
