@@ -30,8 +30,8 @@ This is implementated as a windowsform application.
     * Or download the zip file from https://github.com/vNeon/EKare-LocalServer-GUI.git
   
 2. Open the project using Visual studio
-    * Navigate to the GitHub project and double click on the file "WindowsFormsApplication1.sln".
-The file "WindowsFormsApplication1.sln" should be in the same directory as this README.md file.
+    * Navigate to the GitHub project and double click on the file "EKare-LocalServer-GUI.sln".
+The file "EKare-LocalServer-GUI.sln" should be in the same directory as this README.md file.
 
 3. Plugin your Kinect device.
 
